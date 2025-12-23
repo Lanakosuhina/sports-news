@@ -3,13 +3,171 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Menu, X, Search, ChevronDown } from 'lucide-react'
-import { Category } from '@prisma/client'
 
-interface HeaderProps {
-  categories: Category[]
+interface NavItem {
+  name: string
+  href?: string
+  children?: NavItem[]
 }
 
-export default function Header({ categories }: HeaderProps) {
+const navigation: NavItem[] = [
+  {
+    name: 'Букмекеры',
+    children: [
+      { name: 'Букмекеры с бонусами', href: '/category/bukmekeryi-s-bonusami' },
+      { name: 'Приложения букмекеров', href: '/category/prilozheniya-bukmekerov' },
+      { name: 'Все легальные букмекеры', href: '/category/vse-legalnyie-bukmekeryi' },
+      { name: 'Народный рейтинг', href: '/category/narodnyiy-reyting' },
+    ]
+  },
+  {
+    name: 'Бонусы',
+    children: [
+      { name: 'Без депозита', href: '/category/bez-depozita' },
+      { name: 'Фрибет', href: '/category/fribet' },
+      {
+        name: 'По букмекеру',
+        children: [
+          { name: 'Промокод Winline', href: '/category/promokod-winline' },
+          { name: 'Промокоды Fonbet', href: '/category/promokodyi-fonbet' },
+        ]
+      },
+    ]
+  },
+  {
+    name: 'Центр ставок',
+    children: [
+      { name: 'Матчи сегодня', href: '/matches/today' },
+      { name: 'Матчи завтра', href: '/matches/tomorrow' },
+      { name: 'Все матчи', href: '/matches' },
+      {
+        name: 'Футбол',
+        children: [
+          { name: 'Лига чемпионов', href: '/category/liga-chempionov' },
+          { name: 'Лига Европы', href: '/category/liga-evropyi' },
+          { name: 'РПЛ', href: '/category/rpl' },
+          { name: 'Кубок России', href: '/category/kubok-rossii' },
+          { name: 'ЧМ-2026 Европа', href: '/category/chm-2026-evropa' },
+          { name: 'ЧМ-2026 CONMEBOL', href: '/category/chm-2026-conmebol' },
+          { name: 'АПЛ', href: '/category/apl' },
+          { name: 'Ла Лига', href: '/category/la-liga' },
+          { name: 'Серия А', href: '/category/seriya-a' },
+          { name: 'Бундеслига', href: '/category/bundesliga' },
+          { name: 'Лига 1', href: '/category/liga-1' },
+        ]
+      },
+      {
+        name: 'Хоккей',
+        children: [
+          { name: 'КХЛ', href: '/category/khl' },
+          { name: 'МЧМ-2026', href: '/category/mchm-2026' },
+        ]
+      },
+      {
+        name: 'Теннис',
+        children: [
+          { name: 'Australian Open', href: '/category/australian-open' },
+          { name: 'Roland Garros', href: '/category/roland-garros' },
+          { name: 'Уимблдон', href: '/category/uimbldon' },
+          { name: 'US Open', href: '/category/us-open' },
+          { name: 'ATP Tour', href: '/category/atp-tour' },
+          { name: 'WTA Tour', href: '/category/wta-tour' },
+        ]
+      },
+    ]
+  },
+  {
+    name: 'Новости',
+    children: [
+      { name: 'Футбол', href: '/category/futbol' },
+      { name: 'Хоккей', href: '/category/hokkey' },
+      { name: 'Теннис', href: '/category/tennis' },
+      { name: 'Баскетбол', href: '/category/basketbol' },
+      { name: 'ММА', href: '/category/mma' },
+      { name: 'Бокс', href: '/category/boks' },
+    ]
+  },
+]
+
+function NavDropdown({ item, mobile = false }: { item: NavItem; mobile?: boolean }) {
+  const [open, setOpen] = useState(false)
+
+  if (!item.children) {
+    return (
+      <Link
+        href={item.href || '#'}
+        className={mobile
+          ? "block px-4 py-2 hover:bg-slate-800 rounded-lg transition"
+          : "px-4 py-2 hover:bg-slate-800 rounded-lg transition whitespace-nowrap"
+        }
+      >
+        {item.name}
+      </Link>
+    )
+  }
+
+  if (mobile) {
+    return (
+      <div>
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-800 rounded-lg transition"
+        >
+          {item.name}
+          <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+        {open && (
+          <div className="ml-4 mt-1 space-y-1">
+            {item.children.map((child) => (
+              <NavDropdown key={child.name} item={child} mobile />
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative group">
+      <button className="px-4 py-2 hover:bg-slate-800 rounded-lg transition flex items-center gap-1 whitespace-nowrap">
+        {item.name} <ChevronDown className="w-4 h-4" />
+      </button>
+      <div className="absolute top-full left-0 bg-slate-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all min-w-[220px] py-2 z-50">
+        {item.children.map((child) => (
+          child.children ? (
+            <div key={child.name} className="relative group/sub">
+              <button className="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-700 text-left">
+                {child.name}
+                <ChevronDown className="w-4 h-4 -rotate-90" />
+              </button>
+              <div className="absolute left-full top-0 bg-slate-800 rounded-lg shadow-lg opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all min-w-[200px] py-2">
+                {child.children.map((subChild) => (
+                  <Link
+                    key={subChild.name}
+                    href={subChild.href || '#'}
+                    className="block px-4 py-2 hover:bg-slate-700 whitespace-nowrap"
+                  >
+                    {subChild.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <Link
+              key={child.name}
+              href={child.href || '#'}
+              className="block px-4 py-2 hover:bg-slate-700 whitespace-nowrap"
+            >
+              {child.name}
+            </Link>
+          )
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -41,7 +199,7 @@ export default function Header({ categories }: HeaderProps) {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/page/about" className="text-slate-400 hover:text-white transition">О нас</Link>
-            <Link href="/page/advertising" className="text-slate-400 hover:text-white transition">Реклама</Link>
+            <Link href="/page/contacts" className="text-slate-400 hover:text-white transition">Контакты</Link>
           </div>
         </div>
       </div>
@@ -62,33 +220,9 @@ export default function Header({ categories }: HeaderProps) {
             <Link href="/" className="px-4 py-2 hover:bg-slate-800 rounded-lg transition">
               Главная
             </Link>
-            {categories.slice(0, 6).map((category) => (
-              <Link
-                key={category.id}
-                href={`/category/${category.slug}`}
-                className="px-4 py-2 hover:bg-slate-800 rounded-lg transition"
-              >
-                {category.name}
-              </Link>
+            {navigation.map((item) => (
+              <NavDropdown key={item.name} item={item} />
             ))}
-            {categories.length > 6 && (
-              <div className="relative group">
-                <button className="px-4 py-2 hover:bg-slate-800 rounded-lg transition flex items-center gap-1">
-                  Ещё <ChevronDown className="w-4 h-4" />
-                </button>
-                <div className="absolute top-full left-0 bg-slate-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all min-w-[200px]">
-                  {categories.slice(6).map((category) => (
-                    <Link
-                      key={category.id}
-                      href={`/category/${category.slug}`}
-                      className="block px-4 py-2 hover:bg-slate-700 first:rounded-t-lg last:rounded-b-lg"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </nav>
 
           {/* Search and mobile menu */}
@@ -135,7 +269,7 @@ export default function Header({ categories }: HeaderProps) {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <nav className="lg:hidden pb-4 space-y-1">
+          <nav className="lg:hidden pb-4 space-y-1 max-h-[70vh] overflow-y-auto">
             <Link
               href="/"
               className="block px-4 py-2 hover:bg-slate-800 rounded-lg transition"
@@ -143,15 +277,8 @@ export default function Header({ categories }: HeaderProps) {
             >
               Главная
             </Link>
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/category/${category.slug}`}
-                className="block px-4 py-2 hover:bg-slate-800 rounded-lg transition"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {category.name}
-              </Link>
+            {navigation.map((item) => (
+              <NavDropdown key={item.name} item={item} mobile />
             ))}
           </nav>
         )}

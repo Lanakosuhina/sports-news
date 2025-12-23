@@ -20,20 +20,64 @@ async function main() {
 
   console.log('Created admin user:', admin.email)
 
-  // Create categories (Russian)
+  // Create main categories (Russian)
   const categories = [
-    { name: 'Футбол', slug: 'football', order: 1 },
-    { name: 'Баскетбол', slug: 'basketball', order: 2 },
-    { name: 'Хоккей', slug: 'hockey', order: 3 },
-    { name: 'Теннис', slug: 'tennis', order: 4 },
-    { name: 'Киберспорт', slug: 'esports', order: 5 },
-    { name: 'Другие виды', slug: 'other-sports', order: 6 },
+    // Main sections
+    { name: 'Букмекеры', slug: 'bukmekeryi', order: 1 },
+    { name: 'Бонусы', slug: 'bonusyi', order: 2 },
+    { name: 'Центр ставок', slug: 'tsentr-stavok', order: 3 },
+    { name: 'Новости', slug: 'novosti', order: 4 },
+
+    // Букмекеры subcategories
+    { name: 'Букмекеры с бонусами', slug: 'bukmekeryi-s-bonusami', order: 10 },
+    { name: 'Приложения букмекеров', slug: 'prilozheniya-bukmekerov', order: 11 },
+    { name: 'Все легальные букмекеры', slug: 'vse-legalnyie-bukmekeryi', order: 12 },
+    { name: 'Народный рейтинг', slug: 'narodnyiy-reyting', order: 13 },
+
+    // Бонусы subcategories
+    { name: 'Без депозита', slug: 'bez-depozita', order: 20 },
+    { name: 'Фрибет', slug: 'fribet', order: 21 },
+    { name: 'Промокод Winline', slug: 'promokod-winline', order: 22 },
+    { name: 'Промокоды Fonbet', slug: 'promokodyi-fonbet', order: 23 },
+
+    // Football leagues (Центр ставок -> Футбол)
+    { name: 'Лига чемпионов', slug: 'liga-chempionov', order: 30 },
+    { name: 'Лига Европы', slug: 'liga-evropyi', order: 31 },
+    { name: 'РПЛ', slug: 'rpl', order: 32 },
+    { name: 'Кубок России', slug: 'kubok-rossii', order: 33 },
+    { name: 'ЧМ-2026 Европа', slug: 'chm-2026-evropa', order: 34 },
+    { name: 'ЧМ-2026 CONMEBOL', slug: 'chm-2026-conmebol', order: 35 },
+    { name: 'АПЛ', slug: 'apl', order: 36 },
+    { name: 'Ла Лига', slug: 'la-liga', order: 37 },
+    { name: 'Серия А', slug: 'seriya-a', order: 38 },
+    { name: 'Бундеслига', slug: 'bundesliga', order: 39 },
+    { name: 'Лига 1', slug: 'liga-1', order: 40 },
+
+    // Hockey (Центр ставок -> Хоккей)
+    { name: 'КХЛ', slug: 'khl', order: 50 },
+    { name: 'МЧМ-2026', slug: 'mchm-2026', order: 51 },
+
+    // Tennis (Центр ставок -> Теннис)
+    { name: 'Australian Open', slug: 'australian-open', order: 60 },
+    { name: 'Roland Garros', slug: 'roland-garros', order: 61 },
+    { name: 'Уимблдон', slug: 'uimbldon', order: 62 },
+    { name: 'US Open', slug: 'us-open', order: 63 },
+    { name: 'ATP Tour', slug: 'atp-tour', order: 64 },
+    { name: 'WTA Tour', slug: 'wta-tour', order: 65 },
+
+    // News categories (Новости)
+    { name: 'Футбол', slug: 'futbol', order: 70 },
+    { name: 'Хоккей', slug: 'hokkey', order: 71 },
+    { name: 'Теннис', slug: 'tennis', order: 72 },
+    { name: 'Баскетбол', slug: 'basketbol', order: 73 },
+    { name: 'ММА', slug: 'mma', order: 74 },
+    { name: 'Бокс', slug: 'boks', order: 75 },
   ]
 
   for (const category of categories) {
     await prisma.category.upsert({
       where: { slug: category.slug },
-      update: { name: category.name },
+      update: { name: category.name, order: category.order },
       create: category,
     })
   }
@@ -41,17 +85,15 @@ async function main() {
   console.log('Created categories')
 
   // Create some leagues
-  const football = await prisma.category.findUnique({ where: { slug: 'football' } })
+  const footballCategory = await prisma.category.findUnique({ where: { slug: 'futbol' } })
 
-  let premierLeague, laLiga, championsLeague
-
-  if (football) {
+  if (footballCategory) {
     const leagues = [
-      { name: 'Премьер-лига', slug: 'premier-league', country: 'Англия', categoryId: football.id },
-      { name: 'Ла Лига', slug: 'la-liga', country: 'Испания', categoryId: football.id },
-      { name: 'Лига чемпионов', slug: 'champions-league', country: 'Европа', categoryId: football.id },
-      { name: 'Чемпионат мира', slug: 'world-cup', country: 'Международный', categoryId: football.id },
-      { name: 'РПЛ', slug: 'rpl', country: 'Россия', categoryId: football.id },
+      { name: 'Премьер-лига', slug: 'premier-league', country: 'Англия', categoryId: footballCategory.id },
+      { name: 'Ла Лига', slug: 'la-liga-league', country: 'Испания', categoryId: footballCategory.id },
+      { name: 'Лига чемпионов', slug: 'champions-league', country: 'Европа', categoryId: footballCategory.id },
+      { name: 'Чемпионат мира', slug: 'world-cup', country: 'Международный', categoryId: footballCategory.id },
+      { name: 'РПЛ', slug: 'rpl-league', country: 'Россия', categoryId: footballCategory.id },
     ]
 
     for (const league of leagues) {
@@ -61,10 +103,6 @@ async function main() {
         create: league,
       })
     }
-
-    premierLeague = await prisma.league.findUnique({ where: { slug: 'premier-league' } })
-    laLiga = await prisma.league.findUnique({ where: { slug: 'la-liga' } })
-    championsLeague = await prisma.league.findUnique({ where: { slug: 'champions-league' } })
 
     console.log('Created leagues')
   }
@@ -103,6 +141,8 @@ async function main() {
   console.log('Created teams')
 
   // Create standings for Premier League
+  const premierLeague = await prisma.league.findUnique({ where: { slug: 'premier-league' } })
+
   if (premierLeague) {
     const currentYear = new Date().getFullYear()
     const season = `${currentYear}-${currentYear + 1}`
@@ -221,6 +261,9 @@ async function main() {
     { name: 'Роналду', slug: 'ronaldo' },
     { name: 'Премьер-лига', slug: 'premier-league-tag' },
     { name: 'Ла Лига', slug: 'la-liga-tag' },
+    { name: 'Ставки', slug: 'stavki' },
+    { name: 'Прогнозы', slug: 'prognozy' },
+    { name: 'Букмекеры', slug: 'bukmekeryi-tag' },
   ]
 
   for (const tag of tags) {
@@ -242,9 +285,15 @@ async function main() {
       isPublished: true,
     },
     {
-      title: 'Реклама',
-      slug: 'advertising',
-      content: '<h2>Размещение рекламы</h2><p>Охватите миллионы увлечённых спортивных болельщиков через нашу рекламную платформу.</p><p>Мы предлагаем различные варианты рекламы, включая баннерную рекламу, спонсорский контент и спонсорство рассылки.</p><h3>Контакты</h3><p>Свяжитесь с нами по адресу reklama@trendysporta.ru для получения информации о тарифах и наличии мест.</p><h3>Преимущества</h3><ul><li>Целевая аудитория спортивных болельщиков</li><li>Высокая вовлечённость пользователей</li><li>Гибкие форматы размещения</li></ul>',
+      title: 'Контакты',
+      slug: 'contacts',
+      content: '<h2>Контакты</h2><p>Свяжитесь с нами по любым вопросам:</p><h3>Редакция</h3><p>Email: info@trendysporta.ru</p><h3>Реклама</h3><p>Email: reklama@trendysporta.ru</p><h3>Техническая поддержка</h3><p>Email: support@trendysporta.ru</p><h3>Адрес</h3><p>г. Москва, ул. Спортивная, д. 1</p>',
+      isPublished: true,
+    },
+    {
+      title: 'Пользовательское соглашение',
+      slug: 'user-agreement',
+      content: '<h2>Пользовательское соглашение</h2><p>Последнее обновление: Декабрь 2024</p><h3>1. Общие положения</h3><p>Настоящее Пользовательское соглашение регулирует отношения между администрацией сайта Тренды Спорта и пользователями сайта.</p><h3>2. Права и обязанности сторон</h3><p>Пользователь обязуется не нарушать законодательство РФ при использовании сайта.</p><h3>3. Ответственность</h3><p>Администрация сайта не несёт ответственности за действия пользователей.</p><h3>4. Изменение соглашения</h3><p>Администрация оставляет за собой право изменять настоящее соглашение без предварительного уведомления.</p>',
       isPublished: true,
     },
     {
@@ -259,12 +308,24 @@ async function main() {
       content: '<h2>Политика использования Cookie</h2><p>Последнее обновление: Декабрь 2024</p><p>Настоящая Политика Cookie объясняет, как Тренды Спорта использует файлы cookie и аналогичные технологии.</p><h3>Что такое Cookie?</h3><p>Cookie — это небольшие текстовые файлы, которые размещаются на вашем устройстве при посещении веб-сайта.</p><h3>Как мы используем Cookie</h3><p>Мы используем cookie для анализа трафика сайта, персонализации контента и показа целевой рекламы.</p><h3>Ваш выбор</h3><p>Вы можете управлять cookie через настройки браузера. Однако отключение cookie может повлиять на функциональность нашего веб-сайта.</p>',
       isPublished: true,
     },
+    {
+      title: 'Ответственная игра',
+      slug: 'responsible-gaming',
+      content: '<h2>Ответственная игра</h2><p>Мы заботимся о наших пользователях и поддерживаем принципы ответственной игры.</p><h3>Признаки проблемной игры</h3><ul><li>Вы тратите больше денег, чем можете себе позволить</li><li>Вы играете, чтобы отвлечься от проблем</li><li>Вы пытаетесь отыграть проигрыши</li><li>Вы занимаете деньги для игры</li></ul><h3>Что делать?</h3><p>Если вы или ваши близкие столкнулись с проблемой игровой зависимости, обратитесь за помощью к специалистам.</p><h3>Полезные ресурсы</h3><p>Горячая линия психологической помощи: 8-800-2000-122 (бесплатно по России)</p><h3>Помните</h3><p>Азартные игры предназначены для развлечения. Играйте ответственно!</p>',
+      isPublished: true,
+    },
+    {
+      title: 'Реклама',
+      slug: 'advertising',
+      content: '<h2>Размещение рекламы</h2><p>Охватите миллионы увлечённых спортивных болельщиков через нашу рекламную платформу.</p><p>Мы предлагаем различные варианты рекламы, включая баннерную рекламу, спонсорский контент и спонсорство рассылки.</p><h3>Контакты</h3><p>Свяжитесь с нами по адресу reklama@trendysporta.ru для получения информации о тарифах и наличии мест.</p><h3>Преимущества</h3><ul><li>Целевая аудитория спортивных болельщиков</li><li>Высокая вовлечённость пользователей</li><li>Гибкие форматы размещения</li></ul>',
+      isPublished: true,
+    },
   ]
 
   for (const page of pages) {
     await prisma.page.upsert({
       where: { slug: page.slug },
-      update: {},
+      update: { title: page.title, content: page.content },
       create: page,
     })
   }
@@ -297,8 +358,8 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      siteName: 'Sports News',
-      siteDescription: 'Your trusted source for the latest sports news, match results, and in-depth analysis.',
+      siteName: 'Тренды спорта',
+      siteDescription: 'Ваш надёжный источник последних спортивных новостей, результатов матчей и аналитики.',
     },
   })
 
@@ -312,7 +373,7 @@ async function main() {
       type: 'RSS' as const,
       url: 'https://www.bbc.com/sport',
       feedUrl: 'https://feeds.bbci.co.uk/sport/rss.xml',
-      defaultCategory: 'football',
+      defaultCategory: 'futbol',
       checkInterval: 30,
     },
     {
@@ -321,7 +382,7 @@ async function main() {
       type: 'RSS' as const,
       url: 'https://www.espn.com',
       feedUrl: 'https://www.espn.com/espn/rss/news',
-      defaultCategory: 'football',
+      defaultCategory: 'futbol',
       checkInterval: 30,
     },
   ]
