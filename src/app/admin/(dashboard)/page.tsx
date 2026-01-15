@@ -112,7 +112,7 @@ export default async function AdminDashboardPage() {
       label: 'Просмотров',
       value: stats.totalViews.toLocaleString(),
       icon: Eye,
-      color: 'bg-orange-500',
+      color: 'bg-blue-500',
     },
   ]
 
@@ -123,7 +123,7 @@ export default async function AdminDashboardPage() {
         <h1 className="text-2xl font-bold text-slate-900">Панель управления</h1>
         <Link
           href="/admin/articles/new"
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
         >
           <Plus className="w-5 h-5" />
           <span>Новая статья</span>
@@ -157,7 +157,7 @@ export default async function AdminDashboardPage() {
             <h2 className="font-semibold text-slate-900">Последние статьи</h2>
             <Link
               href="/admin/articles"
-              className="text-sm text-orange-500 hover:text-orange-600"
+              className="text-sm text-blue-500 hover:text-blue-600"
             >
               Все статьи →
             </Link>

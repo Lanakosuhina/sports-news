@@ -46,7 +46,7 @@ export default async function StaticPage({ params }: StaticPageProps) {
       <div className="max-w-4xl mx-auto">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/" className="hover:text-orange-500">
+          <Link href="/" className="hover:text-blue-500">
             Главная
           </Link>
           <span>/</span>

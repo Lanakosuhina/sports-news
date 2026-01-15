@@ -32,7 +32,7 @@ async function main() {
     { name: 'Букмекеры с бонусами', slug: 'bukmekeryi-s-bonusami', order: 10 },
     { name: 'Приложения букмекеров', slug: 'prilozheniya-bukmekerov', order: 11 },
     { name: 'Все легальные букмекеры', slug: 'vse-legalnyie-bukmekeryi', order: 12 },
-    { name: 'Народный рейтинг', slug: 'narodnyiy-reyting', order: 13 },
+    { name: 'Честный рейтинг', slug: 'chestnyiy-reyting', order: 13 },
 
     // Бонусы subcategories
     { name: 'Без депозита', slug: 'bez-depozita', order: 20 },
@@ -281,7 +281,7 @@ async function main() {
     {
       title: 'О нас',
       slug: 'about',
-      content: '<h2>О портале Тренды Спорта</h2><p>Тренды Спорта — ваш надёжный источник последних спортивных новостей, результатов матчей и аналитики со всего мира.</p><p>Наша команда опытных спортивных журналистов работает круглосуточно, чтобы предоставить вам свежие новости, эксклюзивные интервью и экспертные комментарии по футболу, баскетболу, хоккею, теннису, киберспорту и другим видам спорта.</p><h3>Наша миссия</h3><p>Мы стремимся быть лучшим источником спортивных новостей для русскоязычной аудитории, предоставляя актуальную и достоверную информацию.</p>',
+      content: '<h2>О портале Тренды Спорта</h2><p> Мы – спортивное СМИ, всем сердцем любящее спорт. Честно пишем о спорте для тех, кто разделяет нашу страсть!</p><p>Наша команда опытных спортивных журналистов работает круглосуточно, чтобы предоставить вам свежие новости, эксклюзивные интервью и экспертные комментарии по футболу, баскетболу, хоккею, теннису, киберспорту и другим видам спорта.</p><h3>Наша миссия</h3><p>Мы стремимся быть лучшим источником спортивных новостей для русскоязычной аудитории, предоставляя актуальную и достоверную информацию.</p>',
       isPublished: true,
     },
     {
@@ -359,7 +359,7 @@ async function main() {
     create: {
       id: 'default',
       siteName: 'Тренды спорта',
-      siteDescription: 'Ваш надёжный источник последних спортивных новостей, результатов матчей и аналитики.',
+      siteDescription: 'Мы – спортивное СМИ, всем сердцем любящее спорт. Честно пишем о спорте для тех, кто разделяет нашу страсть!',
     },
   })
 
@@ -396,6 +396,205 @@ async function main() {
   }
 
   console.log('Created import sources')
+
+  // Create bookmakers
+  // Order: winline, leon, fonbet, betboom, bettery, betcity, marathon, bet, melbet, balbet, liga stavok, olympbet
+  const bookmakersData = [
+    {
+      name: 'Winline',
+      slug: 'winline',
+      logo: '/bookmakers/winline.svg',
+      bonus: '3000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 1439,
+      playersCount: 10589,
+      rating: 4.8,
+      link: 'https://winline.ru',
+      order: 1,
+      ratingOrder: 1,
+    },
+    {
+      name: 'Leon',
+      slug: 'leon',
+      logo: '/bookmakers/leon.svg',
+      bonus: '25000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 1188,
+      playersCount: 6321,
+      rating: 4.7,
+      link: 'https://leon.ru',
+      order: 2,
+      ratingOrder: 2,
+    },
+    {
+      name: 'Fonbet',
+      slug: 'fonbet',
+      logo: '/bookmakers/fonbet.svg',
+      bonus: '15000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 2404,
+      playersCount: 11248,
+      rating: 4.6,
+      link: 'https://fonbet.ru',
+      order: 3,
+      ratingOrder: 3,
+    },
+    {
+      name: 'BetBoom',
+      slug: 'betboom',
+      logo: '/bookmakers/betboom.svg',
+      bonus: '10000 ₽',
+      bonusLabel: 'Эксклюзив',
+      reviewsCount: 681,
+      playersCount: 5303,
+      rating: 4.5,
+      link: 'https://betboom.ru',
+      order: 4,
+      ratingOrder: 4,
+    },
+    {
+      name: 'Bettery',
+      slug: 'bettery',
+      logo: '/bookmakers/bettery.svg',
+      bonus: '10000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 520,
+      playersCount: 3200,
+      rating: 4.4,
+      link: 'https://bettery.ru',
+      order: 5,
+      ratingOrder: 5,
+    },
+    {
+      name: 'Betcity',
+      slug: 'betcity',
+      logo: '/bookmakers/betcity.svg',
+      bonus: '10000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 567,
+      playersCount: 1800,
+      rating: 4.3,
+      link: 'https://betcity.ru',
+      order: 6,
+      ratingOrder: 6,
+    },
+    {
+      name: 'Марафон',
+      slug: 'marathon',
+      logo: '/bookmakers/marathon.svg',
+      bonus: '10000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 890,
+      playersCount: 4500,
+      rating: 4.2,
+      link: 'https://marathonbet.ru',
+      order: 7,
+      ratingOrder: 7,
+    },
+    {
+      name: 'Бет',
+      slug: 'bet',
+      logo: '/bookmakers/bet.svg',
+      bonus: '5000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 340,
+      playersCount: 2100,
+      rating: 4.1,
+      link: 'https://1xbet.ru',
+      order: 8,
+      ratingOrder: 8,
+    },
+    {
+      name: 'Melbet',
+      slug: 'melbet',
+      logo: '/bookmakers/melbet.svg',
+      bonus: '7000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 456,
+      playersCount: 2800,
+      rating: 4.0,
+      link: 'https://melbet.ru',
+      order: 9,
+      ratingOrder: 9,
+    },
+    {
+      name: 'Балтбет',
+      slug: 'balbet',
+      logo: '/bookmakers/balbet.svg',
+      bonus: '5000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 456,
+      playersCount: 2100,
+      rating: 3.9,
+      link: 'https://baltbet.ru',
+      order: 10,
+      ratingOrder: 10,
+    },
+    {
+      name: 'Лига Ставок',
+      slug: 'liga-stavok',
+      logo: '/bookmakers/liga-stavok.svg',
+      bonus: '7777 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 1850,
+      playersCount: 7195,
+      rating: 4.5,
+      link: 'https://ligastavok.ru',
+      order: 11,
+      ratingOrder: 11,
+    },
+    {
+      name: 'Olimpbet',
+      slug: 'olimpbet',
+      logo: '/bookmakers/olimpbet.svg',
+      bonus: '15000 ₽',
+      bonusLabel: 'Новым игрокам',
+      reviewsCount: 1103,
+      playersCount: 5468,
+      rating: 4.3,
+      link: 'https://olimpbet.ru',
+      order: 12,
+      ratingOrder: 12,
+    },
+  ]
+
+  for (const bookmaker of bookmakersData) {
+    await prisma.bookmaker.upsert({
+      where: { slug: bookmaker.slug },
+      update: {
+        name: bookmaker.name,
+        logo: bookmaker.logo,
+        bonus: bookmaker.bonus,
+        bonusLabel: bookmaker.bonusLabel,
+        reviewsCount: bookmaker.reviewsCount,
+        playersCount: bookmaker.playersCount,
+        rating: bookmaker.rating,
+        link: bookmaker.link,
+        order: bookmaker.order,
+        ratingOrder: bookmaker.ratingOrder,
+      },
+      create: bookmaker,
+    })
+  }
+
+  console.log('Created bookmakers')
+
+  // Create selections
+  const selectionsData = [
+    { name: 'Букмекеры с бонусами', slug: 'bukmekeryi-s-bonusami', icon: 'gift', order: 1 },
+    { name: 'Букмекеры на мобильных', slug: 'prilozheniya-bukmekerov', icon: 'smartphone', order: 2 },
+    { name: 'Легальные букмекеры', slug: 'vse-legalnyie-bukmekeryi', icon: 'diamond', order: 3 },
+  ]
+
+  for (const selection of selectionsData) {
+    await prisma.selection.upsert({
+      where: { slug: selection.slug },
+      update: { name: selection.name, icon: selection.icon, order: selection.order },
+      create: selection,
+    })
+  }
+
+  console.log('Created selections')
 
   console.log('Seed completed successfully!')
 }

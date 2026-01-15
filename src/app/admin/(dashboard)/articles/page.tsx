@@ -100,7 +100,7 @@ export default async function AdminArticlesPage({
         <h1 className="text-2xl font-bold text-slate-900">Статьи</h1>
         <Link
           href="/admin/articles/new"
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
         >
           <Plus className="w-5 h-5" />
           <span>Новая статья</span>
@@ -118,7 +118,7 @@ export default async function AdminArticlesPage({
                 name="q"
                 defaultValue={q}
                 placeholder="Поиск статей..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             </div>
@@ -128,7 +128,7 @@ export default async function AdminArticlesPage({
           <select
             name="status"
             defaultValue={status || ''}
-            className="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Все статусы</option>
             <option value="DRAFT">Черновик</option>
@@ -140,7 +140,7 @@ export default async function AdminArticlesPage({
           <select
             name="category"
             defaultValue={category || ''}
-            className="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Все категории</option>
             {categories.map((cat) => (
@@ -204,7 +204,7 @@ export default async function AdminArticlesPage({
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/articles/${article.id}`}
-                        className="font-medium text-slate-900 hover:text-orange-500 line-clamp-1"
+                        className="font-medium text-slate-900 hover:text-blue-500 line-clamp-1"
                       >
                         {article.title}
                       </Link>
@@ -248,7 +248,7 @@ export default async function AdminArticlesPage({
                         )}
                         <Link
                           href={`/admin/articles/${article.id}`}
-                          className="p-2 text-slate-400 hover:text-orange-500 transition"
+                          className="p-2 text-slate-400 hover:text-blue-500 transition"
                           title="Редактировать"
                         >
                           <Edit className="w-4 h-4" />

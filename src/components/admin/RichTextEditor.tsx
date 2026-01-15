@@ -37,7 +37,7 @@ export default function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-orange-500 underline',
+          class: 'text-blue-500 underline',
         },
       }),
       Image.configure({
@@ -105,7 +105,7 @@ export default function RichTextEditor({
       onClick={onClick}
       title={title}
       className={`p-2 rounded hover:bg-slate-100 transition ${
-        active ? 'bg-slate-200 text-orange-500' : 'text-slate-600'
+        active ? 'bg-slate-200 text-blue-500' : 'text-slate-600'
       }`}
     >
       {children}

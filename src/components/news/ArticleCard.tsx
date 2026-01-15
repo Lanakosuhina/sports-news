@@ -24,10 +24,10 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-          <span className="inline-block bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-full mb-3">
+          <span className="inline-block bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-full mb-3">
             {article.category.name}
           </span>
-          <h2 className="text-white text-2xl lg:text-4xl font-bold mb-2 group-hover:text-orange-400 transition line-clamp-2">
+          <h2 className="text-white text-2xl lg:text-4xl font-bold mb-2 group-hover:text-blue-400 transition line-clamp-2">
             {article.title}
           </h2>
           <p className="text-slate-300 hidden md:block line-clamp-2 mb-3 max-w-3xl">
@@ -58,10 +58,10 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           />
         </div>
         <div className="flex-1 py-4 pr-4">
-          <span className="inline-block text-orange-500 text-xs font-medium mb-2">
+          <span className="inline-block text-blue-500 text-xs font-medium mb-2">
             {article.category.name}
           </span>
-          <h3 className="font-semibold text-slate-900 group-hover:text-orange-500 transition line-clamp-2 mb-2">
+          <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
             {article.title}
           </h3>
           <p className="text-slate-600 text-sm line-clamp-2 mb-3 hidden md:block">
@@ -92,7 +92,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-slate-900 group-hover:text-orange-500 transition line-clamp-2 text-sm">
+          <h4 className="font-medium text-slate-900 group-hover:text-blue-500 transition line-clamp-2 text-sm">
             {article.title}
           </h4>
           <span className="text-xs text-slate-500 mt-1 block">
@@ -116,12 +116,12 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <span className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+        <span className="absolute top-3 left-3 bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-full">
           {article.category.name}
         </span>
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-slate-900 group-hover:text-orange-500 transition line-clamp-2 mb-2">
+        <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
           {article.title}
         </h3>
         <p className="text-slate-600 text-sm line-clamp-2 mb-3">

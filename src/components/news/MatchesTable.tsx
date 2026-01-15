@@ -44,7 +44,7 @@ export default function MatchesTable({
   ) : variant === 'upcoming' ? (
     <Clock className="w-5 h-5 text-blue-500" />
   ) : (
-    <Trophy className="w-5 h-5 text-orange-500" />
+    <Trophy className="w-5 h-5 text-blue-500" />
   )
 
   return (
@@ -62,7 +62,7 @@ export default function MatchesTable({
               {showLeague && (
                 <Link
                   href={`/category/football?league=${match.league.slug}`}
-                  className="text-xs text-slate-500 hover:text-orange-500 transition"
+                  className="text-xs text-slate-500 hover:text-blue-500 transition"
                 >
                   {match.league.name}
                 </Link>

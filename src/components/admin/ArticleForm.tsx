@@ -176,7 +176,7 @@ export default function ArticleForm({
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Заголовок статьи"
                 />
               </div>
@@ -190,7 +190,7 @@ export default function ArticleForm({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, slug: e.target.value }))
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="article-slug"
                 />
               </div>
@@ -209,7 +209,7 @@ export default function ArticleForm({
               }
               required
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Краткое описание статьи..."
             />
           </div>
@@ -241,7 +241,7 @@ export default function ArticleForm({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, metaTitle: e.target.value }))
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="SEO заголовок (оставьте пустым для использования заголовка статьи)"
                 />
               </div>
@@ -258,7 +258,7 @@ export default function ArticleForm({
                     }))
                   }
                   rows={2}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="SEO описание (оставьте пустым для использования краткого описания)"
                 />
               </div>
@@ -275,7 +275,7 @@ export default function ArticleForm({
                       canonicalUrl: e.target.value,
                     }))
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="https://..."
                 />
               </div>
@@ -298,7 +298,7 @@ export default function ArticleForm({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, status: e.target.value as 'DRAFT' | 'PUBLISHED' | 'SCHEDULED' }))
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="DRAFT">Черновик</option>
                   <option value="PUBLISHED">Опубликовано</option>
@@ -321,7 +321,7 @@ export default function ArticleForm({
                         publishedAt: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -330,7 +330,7 @@ export default function ArticleForm({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white py-3 rounded-lg transition"
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-emerald-300 text-white py-3 rounded-lg transition"
                 >
                   <Save className="w-5 h-5" />
                   <span>{loading ? 'Сохранение...' : 'Сохранить'}</span>
@@ -367,7 +367,7 @@ export default function ArticleForm({
                     }))
                   }
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Выберите категорию</option>
                   {categories.map((cat) => (
@@ -391,7 +391,7 @@ export default function ArticleForm({
                         leagueId: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Выберите лигу (необязательно)</option>
                     {filteredLeagues.map((league) => (
@@ -414,7 +414,7 @@ export default function ArticleForm({
                 return tag ? (
                   <span
                     key={tagId}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm"
                   >
                     #{tag.name}
                     <button
@@ -439,7 +439,7 @@ export default function ArticleForm({
                     setSelectedTags((prev) => [...prev, e.target.value])
                   }
                 }}
-                className="flex-1 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="flex-1 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Добавить тег...</option>
                 {availableTags
@@ -475,7 +475,7 @@ export default function ArticleForm({
                 </button>
               </div>
             ) : null}
-            <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-orange-500 transition">
+            <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 transition">
               <Upload className="w-5 h-5 text-slate-400" />
               <span className="text-slate-600">Загрузить изображение</span>
               <input
@@ -494,7 +494,7 @@ export default function ArticleForm({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))
               }
-              className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="https://..."
             />
           </div>
@@ -526,7 +526,7 @@ export default function ArticleForm({
                 ))}
               </div>
             )}
-            <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-orange-500 transition">
+            <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 transition">
               <Plus className="w-5 h-5 text-slate-400" />
               <span className="text-slate-600">Добавить изображения</span>
               <input
@@ -548,7 +548,7 @@ export default function ArticleForm({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, videoUrl: e.target.value }))
               }
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Ссылка на YouTube или Vimeo"
             />
           </div>

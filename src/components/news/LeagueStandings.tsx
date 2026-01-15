@@ -45,7 +45,7 @@ export default function LeagueStandings({
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="bg-slate-900 text-white px-4 py-3 flex items-center gap-2">
-        <Trophy className="w-5 h-5 text-orange-500" />
+        <Trophy className="w-5 h-5 text-blue-500" />
         <h3 className="font-semibold">{title}</h3>
       </div>
 

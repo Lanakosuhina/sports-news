@@ -136,7 +136,7 @@ export default function MatchImportForm({
           <h2 className="text-lg font-semibold text-slate-900">Add Matches</h2>
           <button
             onClick={addMatch}
-            className="flex items-center gap-2 text-orange-500 hover:text-orange-600 font-medium"
+            className="flex items-center gap-2 text-blue-500 hover:text-blue-600 font-medium"
           >
             <Plus className="w-4 h-4" />
             Add Match
@@ -172,7 +172,7 @@ export default function MatchImportForm({
                   <select
                     value={match.leagueId}
                     onChange={e => updateMatch(match.id, 'leagueId', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select League</option>
                     {leagues.map(league => (
@@ -191,7 +191,7 @@ export default function MatchImportForm({
                   <select
                     value={match.status}
                     onChange={e => updateMatch(match.id, 'status', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {statusOptions.map(opt => (
                       <option key={opt.value} value={opt.value}>
@@ -211,7 +211,7 @@ export default function MatchImportForm({
                     value={match.venue}
                     onChange={e => updateMatch(match.id, 'venue', e.target.value)}
                     placeholder="Stadium name"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -227,7 +227,7 @@ export default function MatchImportForm({
                     value={match.homeTeam}
                     onChange={e => updateMatch(match.id, 'homeTeam', e.target.value)}
                     placeholder="Team name"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -239,7 +239,7 @@ export default function MatchImportForm({
                     value={match.homeScore}
                     onChange={e => updateMatch(match.id, 'homeScore', e.target.value)}
                     placeholder="-"
-                    className="w-16 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-center"
+                    className="w-16 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
                   />
                   <span className="text-slate-400">:</span>
                   <input
@@ -248,7 +248,7 @@ export default function MatchImportForm({
                     value={match.awayScore}
                     onChange={e => updateMatch(match.id, 'awayScore', e.target.value)}
                     placeholder="-"
-                    className="w-16 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-center"
+                    className="w-16 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
                   />
                 </div>
 
@@ -262,7 +262,7 @@ export default function MatchImportForm({
                     value={match.awayTeam}
                     onChange={e => updateMatch(match.id, 'awayTeam', e.target.value)}
                     placeholder="Team name"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -275,7 +275,7 @@ export default function MatchImportForm({
                     type="date"
                     value={match.matchDate}
                     onChange={e => updateMatch(match.id, 'matchDate', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ export default function MatchImportForm({
                     type="time"
                     value={match.matchTime}
                     onChange={e => updateMatch(match.id, 'matchTime', e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -300,7 +300,7 @@ export default function MatchImportForm({
           <button
             onClick={handleImport}
             disabled={importing}
-            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:bg-emerald-300 text-white font-medium py-3 rounded-lg transition"
           >
             {importing ? (
               <Loader2 className="w-5 h-5 animate-spin" />

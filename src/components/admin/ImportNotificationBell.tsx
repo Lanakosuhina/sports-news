@@ -60,7 +60,7 @@ export default function ImportNotificationBell() {
       >
         <Bell className="w-5 h-5" />
         {hasUnread && (
-          <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
         )}
       </button>
 
@@ -76,7 +76,7 @@ export default function ImportNotificationBell() {
               {notifications.length > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-orange-500 hover:text-orange-600"
+                  className="text-xs text-blue-500 hover:text-blue-600"
                 >
                   Mark all read
                 </button>
@@ -90,8 +90,8 @@ export default function ImportNotificationBell() {
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 p-3 hover:bg-slate-50 border-b"
                 >
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Download className="w-5 h-5 text-orange-500" />
+                  <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <Download className="w-5 h-5 text-blue-500" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-slate-900">
@@ -132,7 +132,7 @@ export default function ImportNotificationBell() {
               <Link
                 href="/admin/import"
                 onClick={() => setIsOpen(false)}
-                className="block text-center text-sm text-orange-500 hover:text-orange-600 py-2"
+                className="block text-center text-sm text-blue-500 hover:text-blue-600 py-2"
               >
                 View Import Dashboard
               </Link>

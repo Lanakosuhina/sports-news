@@ -25,28 +25,13 @@ export default function Footer() {
           {/* About */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">Т</span>
-              </div>
+              <img src="/logo.svg" alt="Тренды спорта" className="w-10 h-10" />
               <span className="text-xl font-bold">Тренды спорта</span>
             </div>
             <p className="text-slate-400 mb-4">
-              Ваш надёжный источник последних спортивных новостей, результатов матчей и аналитики со всего мира.
+             Мы – спортивное СМИ,  всем сердцем любящее спорт. Честно пишем о спорте для тех, кто разделяет нашу страсть! 
             </p>
-            <div className="flex gap-3">
-              <a href="#" className="p-2 bg-slate-800 hover:bg-orange-500 rounded-lg transition">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 bg-slate-800 hover:bg-orange-500 rounded-lg transition">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 bg-slate-800 hover:bg-orange-500 rounded-lg transition">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 bg-slate-800 hover:bg-orange-500 rounded-lg transition">
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
+           
           </div>
 
           {/* Categories */}
@@ -57,7 +42,7 @@ export default function Footer() {
                 <li key={category.href}>
                   <Link
                     href={category.href}
-                    className="text-slate-400 hover:text-orange-500 transition"
+                    className="text-slate-400 hover:text-blue-500 transition"
                   >
                     {category.name}
                   </Link>
@@ -72,7 +57,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-slate-400 hover:text-orange-500 transition">
+                  <Link href={link.href} className="text-slate-400 hover:text-blue-500 transition">
                     {link.name}
                   </Link>
                 </li>
@@ -81,20 +66,20 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="min-w-0">
             <h3 className="text-lg font-semibold mb-4">Рассылка</h3>
             <p className="text-slate-400 mb-4">
               Подпишитесь, чтобы получать последние спортивные новости на вашу почту.
             </p>
-            <form className="flex gap-2">
+            <form className="flex flex-col sm:flex-row gap-2 max-w-full">
               <input
                 type="email"
                 placeholder="Ваш email"
-                className="flex-1 bg-slate-800 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="flex-1 min-w-0 bg-slate-800 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="submit"
-                className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-medium transition"
+                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg font-medium transition whitespace-nowrap flex-shrink-0"
               >
                 Подписаться
               </button>
@@ -106,17 +91,12 @@ export default function Footer() {
         <div className="border-t border-slate-800 mt-12 pt-8">
           <div className="text-slate-500 text-sm space-y-4">
             <p>
-              Зарегистрировано Федеральной службой по надзору в сфере связи, информационных технологий
-              и массовых коммуникаций (Роскомнадзор) 17.08.2018. Свидетельство о регистрации СМИ
-              «Тренды спорта» ЭЛ № ФС 77 - 73473
-            </p>
-            <p>
-              При использовании материалов сайта на других ресурсах активная ссылка на Тренды спорта обязательна.
+            Зарегистрировано Федеральной службой по надзору в сфере связи, информационных технологий и массовых коммуникаций (Роскомнадзор) 23.12.2025. Свидетельство о регистрации СМИ «Тренды спорта» ЭЛ № ФС 77 - 90561
             </p>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
-              <p>&copy; 2008 - {new Date().getFullYear()} Тренды спорта. Все права защищены.</p>
-              <div className="flex items-center gap-2 text-orange-500 font-medium">
-                <span className="inline-flex items-center justify-center w-8 h-8 border-2 border-orange-500 rounded-full text-xs">
+              <p>&copy; {new Date().getFullYear()} Тренды спорта. Все права защищены.</p>
+              <div className="flex items-center gap-2 text-blue-500 font-medium">
+                <span className="inline-flex items-center justify-center w-8 h-8 border-2 border-blue-500 rounded-full text-xs">
                   18+
                 </span>
                 <span>Для лиц старше 18 лет</span>

@@ -186,7 +186,7 @@ export default function ImportDashboard({
         </div>
         <button
           onClick={() => setShowAddSource(true)}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
         >
           <Plus className="w-5 h-5" />
           Добавить источник
@@ -204,7 +204,7 @@ export default function ImportDashboard({
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                   {source.type === 'RSS' ? (
-                    <Rss className="w-5 h-5 text-orange-500" />
+                    <Rss className="w-5 h-5 text-blue-500" />
                   ) : (
                     <Globe className="w-5 h-5 text-blue-500" />
                   )}
@@ -254,7 +254,7 @@ export default function ImportDashboard({
             <p className="text-slate-500">Источники импорта не настроены</p>
             <button
               onClick={() => setShowAddSource(true)}
-              className="mt-3 text-orange-500 hover:text-orange-600 font-medium"
+              className="mt-3 text-blue-500 hover:text-blue-600 font-medium"
             >
               Добавить первый источник
             </button>
@@ -325,7 +325,7 @@ export default function ImportDashboard({
                 <div className="flex-1 min-w-0">
                   <button
                     onClick={() => setPreviewItem(item)}
-                    className="text-left hover:text-orange-500 transition"
+                    className="text-left hover:text-blue-500 transition"
                   >
                     <h3 className="font-medium text-slate-900 truncate">
                       {item.title}

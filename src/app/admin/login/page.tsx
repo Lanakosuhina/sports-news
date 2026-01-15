@@ -66,7 +66,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             placeholder="admin@example.com"
           />
         </div>
@@ -85,7 +85,7 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition pr-12"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-12"
               placeholder="••••••••"
             />
             <button
@@ -105,7 +105,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-emerald-300 text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
         >
           {loading ? (
             <span>Вход...</span>
@@ -141,7 +141,7 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">Т</span>
             </div>
             <span className="text-2xl font-bold text-white">Тренды спорта</span>

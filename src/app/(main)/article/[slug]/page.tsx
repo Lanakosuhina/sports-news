@@ -179,13 +179,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className="lg:col-span-2">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-            <Link href="/" className="hover:text-orange-500">
+            <Link href="/" className="hover:text-blue-500">
               Главная
             </Link>
             <span>/</span>
             <Link
               href={`/category/${article.category.slug}`}
-              className="hover:text-orange-500"
+              className="hover:text-blue-500"
             >
               {article.category.name}
             </Link>
@@ -194,7 +194,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 <span>/</span>
                 <Link
                   href={`/category/${article.category.slug}?league=${article.league.slug}`}
-                  className="hover:text-orange-500"
+                  className="hover:text-blue-500"
                 >
                   {article.league.name}
                 </Link>
@@ -234,7 +234,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <Link
                     key={tag.id}
                     href={`/tag/${tag.slug}`}
-                    className="px-3 py-1 bg-slate-100 hover:bg-orange-500 hover:text-white rounded-full text-sm transition"
+                    className="px-3 py-1 bg-slate-100 hover:bg-blue-500 hover:text-white rounded-full text-sm transition"
                   >
                     #{tag.name}
                   </Link>
@@ -351,13 +351,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </div>
             </div>
           )}
-
-          {/* Ad Zone - Bottom */}
-          <div className="bg-slate-100 rounded-xl p-4 text-center mb-8">
-            <div className="bg-slate-200 h-[250px] rounded-lg flex items-center justify-center text-slate-400">
-              <span>Реклама 300x250</span>
-            </div>
-          </div>
 
           {/* Share Buttons */}
           <div className="flex items-center gap-4 py-6 border-t border-b">

@@ -140,7 +140,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
       {/* Tag Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Tag className="w-8 h-8 text-orange-500" />
+          <Tag className="w-8 h-8 text-blue-500" />
           <h1 className="text-3xl font-bold">#{tag.name}</h1>
         </div>
         <p className="text-slate-600">

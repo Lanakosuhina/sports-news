@@ -128,11 +128,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             name="q"
             defaultValue={query}
             placeholder="Поиск новостей..."
-            className="w-full bg-white rounded-xl px-5 py-4 pr-12 text-lg shadow-sm border focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="w-full bg-white rounded-xl px-5 py-4 pr-12 text-lg shadow-sm border focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-orange-500 transition"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-blue-500 transition"
           >
             <Search className="w-6 h-6" />
           </button>

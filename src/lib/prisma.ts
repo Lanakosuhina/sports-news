@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 
+// Re-export Prisma types for type checking
+export type { Bookmaker } from '@prisma/client'
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }

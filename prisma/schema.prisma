@@ -284,3 +284,42 @@ model ImportNotification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// Bookmakers
+
+model Bookmaker {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  slug           String   @unique
+  logo           String?
+  bonus          String?  // e.g., "10000 ₽"
+  bonusLabel     String?  // e.g., "Эксклюзив", "Новым игрокам"
+  reviewsCount   Int      @default(0)
+  playersCount   Int      @default(0)
+  rating         Float    @default(0)
+  link           String   // Play button URL
+  website        String?  // e.g., "winline.ru"
+  hasLicense     Boolean  @default(true)
+  licenseNumber  String?  // e.g., "ФНС №12345"
+  minDeposit     String?  // e.g., "500 ₽"
+  hasIosApp      Boolean  @default(true)
+  hasAndroidApp  Boolean  @default(true)
+  iosAppLink     String?
+  androidAppLink String?
+  isActive       Boolean  @default(true)
+  order          Int      @default(0)
+  ratingOrder    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Selection {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  icon      String?  // Icon name from lucide-react
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -33,7 +33,7 @@ export default function CookieConsent() {
           <div className="flex-1">
             <p className="text-slate-700">
               Мы используем файлы cookie для улучшения работы сайта, показа персонализированной рекламы и анализа трафика. Нажимая «Принять все», вы соглашаетесь на использование cookie.{' '}
-              <Link href="/page/cookie-policy" className="text-orange-500 hover:underline">
+              <Link href="/page/cookie-policy" className="text-blue-500 hover:underline">
                 Политика Cookie
               </Link>
             </p>
@@ -47,7 +47,7 @@ export default function CookieConsent() {
             </button>
             <button
               onClick={acceptCookies}
-              className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition"
+              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition"
             >
               Принять все
             </button>

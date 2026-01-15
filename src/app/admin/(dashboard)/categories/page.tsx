@@ -116,7 +116,7 @@ export default function CategoriesPage() {
         <h1 className="text-2xl font-bold text-slate-900">Категории</h1>
         <button
           onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
         >
           <Plus className="w-5 h-5" />
           <span>Новая категория</span>
@@ -146,7 +146,7 @@ export default function CategoriesPage() {
                     }))
                   }}
                   required
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
@@ -160,7 +160,7 @@ export default function CategoriesPage() {
                     setFormData((prev) => ({ ...prev, slug: e.target.value }))
                   }
                   required
-                  className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function CategoriesPage() {
                   setFormData((prev) => ({ ...prev, description: e.target.value }))
                 }
                 rows={2}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="w-32">
@@ -187,13 +187,13 @@ export default function CategoriesPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, order: parseInt(e.target.value) || 0 }))
                 }
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition"
+                className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
               >
                 <Save className="w-5 h-5" />
                 <span>Сохранить</span>
@@ -249,7 +249,7 @@ export default function CategoriesPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => startEdit(category)}
-                        className="p-2 text-slate-400 hover:text-orange-500 transition"
+                        className="p-2 text-slate-400 hover:text-blue-500 transition"
                       >
                         <Edit className="w-4 h-4" />
                       </button>

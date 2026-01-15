@@ -99,7 +99,7 @@ export default function AddSourceModal({
               onClick={() => setMode('predefined')}
               className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
                 mode === 'predefined'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -109,7 +109,7 @@ export default function AddSourceModal({
               onClick={() => setMode('custom')}
               className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
                 mode === 'custom'
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -130,20 +130,20 @@ export default function AddSourceModal({
                     onClick={() => setSelectedPredefined(source.slug)}
                     className={`p-4 rounded-xl border-2 text-left transition ${
                       selectedPredefined === source.slug
-                        ? 'border-orange-500 bg-orange-50'
+                        ? 'border-blue-500 bg-emerald-50'
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <Rss className="w-5 h-5 text-orange-500" />
+                        <Rss className="w-5 h-5 text-blue-500" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-slate-900">{source.name}</h3>
                         <p className="text-xs text-slate-500">{source.type}</p>
                       </div>
                       {selectedPredefined === source.slug && (
-                        <Check className="w-5 h-5 text-orange-500" />
+                        <Check className="w-5 h-5 text-blue-500" />
                       )}
                     </div>
                   </button>
@@ -159,7 +159,7 @@ export default function AddSourceModal({
               <button
                 onClick={handleAddPredefined}
                 disabled={!selectedPredefined || loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-lg transition"
+                className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-emerald-300 text-white font-medium py-3 rounded-lg transition"
               >
                 {loading ? 'Adding...' : 'Add Selected Source'}
               </button>
@@ -179,7 +179,7 @@ export default function AddSourceModal({
                   value={customSource.name}
                   onChange={e => setCustomSource({ ...customSource, name: e.target.value })}
                   placeholder="e.g., My Sports Blog"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -192,7 +192,7 @@ export default function AddSourceModal({
                   value={customSource.url}
                   onChange={e => setCustomSource({ ...customSource, url: e.target.value })}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -205,7 +205,7 @@ export default function AddSourceModal({
                   value={customSource.feedUrl}
                   onChange={e => setCustomSource({ ...customSource, feedUrl: e.target.value })}
                   placeholder="https://example.com/feed.xml"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -216,7 +216,7 @@ export default function AddSourceModal({
                 <select
                   value={customSource.type}
                   onChange={e => setCustomSource({ ...customSource, type: e.target.value as 'RSS' | 'API' | 'SCRAPER' })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="RSS">RSS Feed</option>
                   <option value="API">API</option>
@@ -227,7 +227,7 @@ export default function AddSourceModal({
               <button
                 onClick={handleAddCustom}
                 disabled={!customSource.name || !customSource.url || loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-lg transition"
+                className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-emerald-300 text-white font-medium py-3 rounded-lg transition"
               >
                 {loading ? 'Adding...' : 'Add Custom Source'}
               </button>

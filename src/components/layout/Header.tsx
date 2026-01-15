@@ -17,7 +17,7 @@ const navigation: NavItem[] = [
       { name: 'Букмекеры с бонусами', href: '/category/bukmekeryi-s-bonusami' },
       { name: 'Приложения букмекеров', href: '/category/prilozheniya-bukmekerov' },
       { name: 'Все легальные букмекеры', href: '/category/vse-legalnyie-bukmekeryi' },
-      { name: 'Народный рейтинг', href: '/category/narodnyiy-reyting' },
+      { name: 'Честный рейтинг', href: '/category/chestnyiy-reyting' },
     ]
   },
   {
@@ -42,49 +42,53 @@ const navigation: NavItem[] = [
       { name: 'Все матчи', href: '/matches' },
       {
         name: 'Футбол',
+        href: '/matches/futbol',
         children: [
-          { name: 'Лига чемпионов', href: '/category/liga-chempionov' },
-          { name: 'Лига Европы', href: '/category/liga-evropyi' },
-          { name: 'РПЛ', href: '/category/rpl' },
-          { name: 'Кубок России', href: '/category/kubok-rossii' },
-          { name: 'ЧМ-2026 Европа', href: '/category/chm-2026-evropa' },
-          { name: 'ЧМ-2026 CONMEBOL', href: '/category/chm-2026-conmebol' },
-          { name: 'АПЛ', href: '/category/apl' },
-          { name: 'Ла Лига', href: '/category/la-liga' },
-          { name: 'Серия А', href: '/category/seriya-a' },
-          { name: 'Бундеслига', href: '/category/bundesliga' },
-          { name: 'Лига 1', href: '/category/liga-1' },
+          { name: 'Все матчи футбола', href: '/matches/futbol' },
+          { name: 'Лига чемпионов', href: '/matches/futbol/liga-chempionov' },
+          { name: 'Лига Европы', href: '/matches/futbol/liga-evropyi' },
+          { name: 'РПЛ', href: '/matches/futbol/rpl' },
+          { name: 'Кубок России', href: '/matches/futbol/kubok-rossii' },
+          { name: 'АПЛ', href: '/matches/futbol/apl' },
+          { name: 'Ла Лига', href: '/matches/futbol/la-liga' },
+          { name: 'Серия А', href: '/matches/futbol/seriya-a' },
+          { name: 'Бундеслига', href: '/matches/futbol/bundesliga' },
+          { name: 'Лига 1', href: '/matches/futbol/liga-1' },
         ]
       },
       {
         name: 'Хоккей',
+        href: '/matches/hokkey',
         children: [
-          { name: 'КХЛ', href: '/category/khl' },
-          { name: 'МЧМ-2026', href: '/category/mchm-2026' },
+          { name: 'Все матчи хоккея', href: '/matches/hokkey' },
+          { name: 'КХЛ', href: '/matches/hokkey/khl' },
+          { name: 'НХЛ', href: '/matches/hokkey/nhl' },
         ]
       },
       {
         name: 'Теннис',
+        href: '/matches/tennis',
         children: [
-          { name: 'Australian Open', href: '/category/australian-open' },
-          { name: 'Roland Garros', href: '/category/roland-garros' },
-          { name: 'Уимблдон', href: '/category/uimbldon' },
-          { name: 'US Open', href: '/category/us-open' },
-          { name: 'ATP Tour', href: '/category/atp-tour' },
-          { name: 'WTA Tour', href: '/category/wta-tour' },
+          { name: 'Все матчи тенниса', href: '/matches/tennis' },
+          { name: 'Australian Open', href: '/matches/tennis/australian-open' },
+          { name: 'Roland Garros', href: '/matches/tennis/roland-garros' },
+          { name: 'Уимблдон', href: '/matches/tennis/uimbldon' },
+          { name: 'US Open', href: '/matches/tennis/us-open' },
         ]
       },
     ]
   },
   {
     name: 'Новости',
+    href: '/news',
     children: [
-      { name: 'Футбол', href: '/category/futbol' },
-      { name: 'Хоккей', href: '/category/hokkey' },
-      { name: 'Теннис', href: '/category/tennis' },
-      { name: 'Баскетбол', href: '/category/basketbol' },
-      { name: 'ММА', href: '/category/mma' },
-      { name: 'Бокс', href: '/category/boks' },
+      { name: 'Все новости', href: '/news' },
+      { name: 'Футбол', href: '/news/futbol' },
+      { name: 'Хоккей', href: '/news/hokkey' },
+      { name: 'Теннис', href: '/news/tennis' },
+      { name: 'Баскетбол', href: '/news/basketbol' },
+      { name: 'ММА', href: '/news/mma' },
+      { name: 'Бокс', href: '/news/boks' },
     ]
   },
 ]
@@ -209,9 +213,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">Т</span>
-            </div>
+            <img src="/logo.svg" alt="Тренды спорта" className="w-10 h-10" />
             <span className="text-xl font-bold">Тренды спорта</span>
           </Link>
 
@@ -254,7 +256,7 @@ export default function Header() {
                 placeholder="Поиск новостей..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-800 rounded-lg px-4 py-3 pr-12 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-slate-800 rounded-lg px-4 py-3 pr-12 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
               <button

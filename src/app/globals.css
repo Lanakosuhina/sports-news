@@ -105,6 +105,175 @@ body {
   margin: 1.5rem 0;
 }
 
+/* Responsible gaming page styles */
+.prose .lead {
+  font-size: 1.125rem;
+  color: #475569;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.prose .highlight {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 4px solid #0ea5e9;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin-top: 2rem;
+}
+
+.prose .highlight strong {
+  color: #0369a1;
+}
+
+/* Cookie policy page styles */
+.prose .cookie-type {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.prose .cookie-type h3 {
+  margin-top: 0;
+  color: #1e293b;
+}
+
+.prose .cookie-badge {
+  display: inline-block;
+  background: #10b981;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.prose .cookie-badge-consent {
+  background: #f59e0b;
+}
+
+.prose .cookie-required {
+  border-left: 4px solid #10b981;
+}
+
+.prose .cookie-functional {
+  border-left: 4px solid #6366f1;
+}
+
+.prose .cookie-analytics {
+  border-left: 4px solid #f59e0b;
+}
+
+.prose .cookie-advertising {
+  border-left: 4px solid #ef4444;
+}
+
+.prose .browser-instructions {
+  background: #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.prose .browser-instructions h4 {
+  color: #334155;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose .browser-instructions h4:first-child {
+  margin-top: 0;
+}
+
+.prose .browser-instructions ol {
+  margin-bottom: 0.5rem;
+}
+
+/* Privacy policy page styles */
+.prose .document-info {
+  background: #f1f5f9;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.prose .warning-box {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-left: 4px solid #f59e0b;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.prose .warning-box-fraud {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  border-left-color: #ef4444;
+}
+
+.prose .warning-box h4 {
+  margin-top: 0;
+  color: #92400e;
+}
+
+.prose .warning-box-fraud h4 {
+  color: #b91c1c;
+}
+
+.prose .info-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.prose .info-box-red {
+  border-left: 4px solid #ef4444;
+}
+
+.prose .info-box-red h4 {
+  color: #b91c1c;
+  margin-top: 0;
+}
+
+.prose .purposes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.prose .purpose-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.prose .purpose-item h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.prose .purpose-item p,
+.prose .purpose-item ul {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.prose .purpose-item ul {
+  padding-left: 1.25rem;
+}
+
 /* Video embed responsive */
 .video-embed {
   position: relative;

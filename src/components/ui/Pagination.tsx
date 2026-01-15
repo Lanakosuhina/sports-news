@@ -68,7 +68,7 @@ export default function Pagination({ currentPage, totalPages, baseUrl }: Paginat
             href={getPageUrl(page)}
             className={`px-3 py-2 rounded-lg transition ${
               page === currentPage
-                ? 'bg-orange-500 text-white'
+                ? 'bg-blue-500 text-white'
                 : 'hover:bg-slate-100'
             }`}
           >
