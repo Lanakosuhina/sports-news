@@ -23,6 +23,13 @@ interface BookmakersRatingTableProps {
 function BookmakerLogo({ bookmaker, rank }: { bookmaker: Bookmaker; rank: number }) {
   const [hasError, setHasError] = useState(false)
 
+  const getRankColor = (rank: number) => {
+    if (rank === 1) return 'bg-yellow-500'
+    if (rank === 2) return 'bg-slate-400'
+    if (rank === 3) return 'bg-amber-600'
+    return 'bg-blue-500'
+  }
+
   if (!bookmaker.logo || hasError) {
     return (
       <div className="relative">
@@ -32,7 +39,7 @@ function BookmakerLogo({ bookmaker, rank }: { bookmaker: Bookmaker; rank: number
           </span>
         </div>
         {rank <= 3 && (
-          <span className="absolute -top-1 -left-1 w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+          <span className={`absolute -top-1 -left-1 w-5 h-5 ${getRankColor(rank)} text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md`}>
             {rank}
           </span>
         )}
@@ -53,7 +60,7 @@ function BookmakerLogo({ bookmaker, rank }: { bookmaker: Bookmaker; rank: number
         />
       </div>
       {rank <= 3 && (
-        <span className="absolute -top-1 -left-1 w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+        <span className={`absolute -top-1 -left-1 w-5 h-5 ${getRankColor(rank)} text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md`}>
           {rank}
         </span>
       )}
@@ -75,18 +82,18 @@ export default function BookmakersRatingTable({ bookmakers, title = 'Честн�
         {bookmakers.map((bookmaker, index) => (
           <div
             key={bookmaker.id}
-            className="flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition"
+            className="flex items-center justify-between p-4 hover:bg-slate-50 transition"
           >
             {/* Logo & Name */}
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-3">
               <BookmakerLogo bookmaker={bookmaker} rank={index + 1} />
-              <span className="font-semibold text-slate-900 text-sm md:text-base">{bookmaker.name}</span>
+              <span className="font-semibold text-slate-900 text-base">{bookmaker.name}</span>
             </div>
 
             {/* Details Button */}
             <Link
               href={`/bookmaker/${bookmaker.slug}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 md:px-6 py-2 md:py-2.5 rounded-lg transition text-sm md:text-base whitespace-nowrap"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap"
             >
               Подробнее
             </Link>

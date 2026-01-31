@@ -1,15 +1,18 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArticleWithRelations } from '@/types'
-import { timeAgo, getImageUrl, truncate } from '@/lib/utils'
+import { timeAgo, getImageUrl, hasImage } from '@/lib/utils'
 
 interface ArticleCardProps {
   article: ArticleWithRelations
-  variant?: 'default' | 'horizontal' | 'featured' | 'compact'
+  variant?: 'default' | 'horizontal' | 'featured' | 'compact' | 'text-only'
 }
 
 export default function ArticleCard({ article, variant = 'default' }: ArticleCardProps) {
+  const articleHasImage = hasImage(article.featuredImage)
+
   if (variant === 'featured') {
+    // Featured always shows with image (using placeholder if none)
     return (
       <Link
         href={`/article/${article.slug}`}
@@ -44,6 +47,28 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
   }
 
   if (variant === 'horizontal') {
+    // Horizontal with optional image
+    if (!articleHasImage) {
+      return (
+        <Link
+          href={`/article/${article.slug}`}
+          className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition p-4"
+        >
+          <span className="inline-block text-blue-500 text-xs font-medium mb-2">
+            {article.category.name}
+          </span>
+          <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
+            {article.title}
+          </h3>
+          <p className="text-slate-600 text-sm line-clamp-3 mb-3">
+            {article.excerpt}
+          </p>
+          <div className="text-xs text-slate-500">
+            <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          </div>
+        </Link>
+      )
+    }
     return (
       <Link
         href={`/article/${article.slug}`}
@@ -67,10 +92,8 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           <p className="text-slate-600 text-sm line-clamp-2 mb-3 hidden md:block">
             {article.excerpt}
           </p>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="text-xs text-slate-500">
             <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
-            <span>•</span>
-            <span>{article.views.toLocaleString()} просм.</span>
           </div>
         </div>
       </Link>
@@ -78,6 +101,22 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
   }
 
   if (variant === 'compact') {
+    // Compact with optional image
+    if (!articleHasImage) {
+      return (
+        <Link
+          href={`/article/${article.slug}`}
+          className="group block py-3 border-b border-slate-100 last:border-0"
+        >
+          <h4 className="font-medium text-slate-900 group-hover:text-blue-500 transition line-clamp-2 text-sm">
+            {article.title}
+          </h4>
+          <span className="text-xs text-slate-500 mt-1 block">
+            {timeAgo(article.publishedAt || article.createdAt)}
+          </span>
+        </Link>
+      )
+    }
     return (
       <Link
         href={`/article/${article.slug}`}
@@ -103,7 +142,52 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
     )
   }
 
-  // Default card
+  // Text-only variant (no image at all)
+  if (variant === 'text-only') {
+    return (
+      <Link
+        href={`/article/${article.slug}`}
+        className="group block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border-l-4 border-blue-500"
+      >
+        <span className="inline-block text-blue-500 text-xs font-medium mb-2">
+          {article.category.name}
+        </span>
+        <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
+          {article.title}
+        </h3>
+        <p className="text-slate-600 text-sm line-clamp-3 mb-3">
+          {article.excerpt}
+        </p>
+        <div className="text-xs text-slate-500">
+          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+        </div>
+      </Link>
+    )
+  }
+
+  // Default card - shows image if available, text-only if not
+  if (!articleHasImage) {
+    return (
+      <Link
+        href={`/article/${article.slug}`}
+        className="group block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border-l-4 border-blue-500"
+      >
+        <span className="inline-block text-blue-500 text-xs font-medium mb-2">
+          {article.category.name}
+        </span>
+        <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
+          {article.title}
+        </h3>
+        <p className="text-slate-600 text-sm line-clamp-3 mb-3">
+          {article.excerpt}
+        </p>
+        <div className="text-xs text-slate-500">
+          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+        </div>
+      </Link>
+    )
+  }
+
   return (
     <Link
       href={`/article/${article.slug}`}
@@ -127,9 +211,8 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
         <p className="text-slate-600 text-sm line-clamp-2 mb-3">
           {article.excerpt}
         </p>
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="text-xs text-slate-500">
           <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
-          <span>{article.views.toLocaleString()} просм.</span>
         </div>
       </div>
     </Link>

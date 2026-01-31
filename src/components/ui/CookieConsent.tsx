@@ -1,18 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { X } from 'lucide-react'
 
-export default function CookieConsent() {
-  const [showBanner, setShowBanner] = useState(false)
+function getInitialShowBanner(): boolean {
+  if (typeof window === 'undefined') return false
+  const consent = localStorage.getItem('cookie-consent')
+  return !consent
+}
 
-  useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent')
-    if (!consent) {
-      setShowBanner(true)
-    }
-  }, [])
+export default function CookieConsent() {
+  const [showBanner, setShowBanner] = useState(getInitialShowBanner)
 
   const acceptCookies = () => {
     localStorage.setItem('cookie-consent', 'accepted')

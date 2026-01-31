@@ -6,6 +6,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
 import { ChevronLeft, Trophy } from 'lucide-react'
 import { getFootballMatches, getHockeyMatches, SportDBMatch } from '@/lib/sportdb'
+import { fetchAllTennisEvents, OddsEvent } from '@/lib/odds-api'
 
 interface SportMatchesPageProps {
   params: Promise<{ sport: string }>
@@ -18,6 +19,40 @@ const sportConfig: Record<string, { name: string; apiSport: string }> = {
   basketbol: { name: 'Баскетбол', apiSport: 'basketball' },
 }
 
+// Convert Odds API events to SportDBMatch format
+function convertOddsEventToMatch(event: OddsEvent): SportDBMatch {
+  return {
+    id: event.id,
+    homeTeam: {
+      name: event.home_team,
+      logo: undefined,
+    },
+    awayTeam: {
+      name: event.away_team,
+      logo: undefined,
+    },
+    homeScore: null,
+    awayScore: null,
+    status: 'scheduled',
+    startTime: event.commence_time,
+    league: {
+      name: event.sport_title,
+      country: undefined,
+    },
+    sport: 'tennis',
+  }
+}
+
+async function getTennisMatches(): Promise<SportDBMatch[]> {
+  try {
+    const events = await fetchAllTennisEvents()
+    return events.map(convertOddsEventToMatch)
+  } catch (error) {
+    console.error('Failed to fetch tennis events:', error)
+    return []
+  }
+}
+
 async function getMatchesBySport(sport: string): Promise<SportDBMatch[]> {
   const config = sportConfig[sport]
   if (!config) return []
@@ -27,6 +62,8 @@ async function getMatchesBySport(sport: string): Promise<SportDBMatch[]> {
       return getFootballMatches()
     case 'hockey':
       return getHockeyMatches()
+    case 'tennis':
+      return getTennisMatches()
     default:
       return []
   }
@@ -114,9 +151,6 @@ export default async function SportMatchesPage({ params }: SportMatchesPageProps
             <Trophy className="w-8 h-8 text-amber-500" />
             <h1 className="text-4xl md:text-5xl font-bold">{config.name}</h1>
           </div>
-          <p className="text-slate-600 text-lg">
-            Все матчи по {config.name.toLowerCase()}
-          </p>
         </div>
 
         {/* Quick Navigation */}

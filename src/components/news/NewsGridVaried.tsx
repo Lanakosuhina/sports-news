@@ -31,9 +31,8 @@ function LargeCard({ article }: { article: ArticleWithRelations }) {
         <p className="text-slate-600 text-sm line-clamp-2 mb-3">
           {article.excerpt}
         </p>
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="text-xs text-slate-500">
           <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
-          <span>{article.views.toLocaleString()} просм.</span>
         </div>
       </div>
     </Link>
@@ -53,7 +52,7 @@ function SmallCard({ article }: { article: ArticleWithRelations }) {
         <h4 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 text-sm mb-2">
           {article.title}
         </h4>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="text-xs text-slate-500">
           <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
         </div>
       </div>
@@ -82,9 +81,8 @@ function MediumCard({ article }: { article: ArticleWithRelations }) {
         <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
           {article.title}
         </h3>
-        <div className="flex items-center justify-between text-xs text-slate-500">
+        <div className="text-xs text-slate-500">
           <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
-          <span>{article.views.toLocaleString()} просм.</span>
         </div>
       </div>
     </Link>
@@ -103,69 +101,26 @@ export default function NewsGridVaried({ articles }: NewsGridVariedProps) {
     )
   }
 
-  // Pattern: Large (spans 2), 2 small text-only, 2 medium with images, repeat
-  const renderArticles = () => {
-    const result: React.ReactNode[] = []
-    let i = 0
-
-    while (i < articles.length) {
-      const patternIndex = Math.floor(i / 5) % 2
-
-      if (patternIndex === 0) {
-        // Pattern A: 1 large + 2 small + 2 medium
-        if (i < articles.length) {
-          result.push(<LargeCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        // 2 small cards in a row
-        if (i < articles.length) {
-          result.push(<SmallCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<SmallCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        // 2 medium cards
-        if (i < articles.length) {
-          result.push(<MediumCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<MediumCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-      } else {
-        // Pattern B: 2 medium + 2 small + 1 large
-        if (i < articles.length) {
-          result.push(<MediumCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<MediumCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<SmallCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<SmallCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-        if (i < articles.length) {
-          result.push(<LargeCard key={articles[i].id} article={articles[i]} />)
-          i++
-        }
-      }
-    }
-
-    return result
-  }
+  // Separate articles with and without images
+  const articlesWithImages = articles.filter(a => a.featuredImage)
+  const articlesWithoutImages = articles.filter(a => !a.featuredImage)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {renderArticles()}
+      {/* Articles with images - large/medium cards */}
+      {articlesWithImages.map((article, index) => {
+        // First article with image is large (spans 2 columns)
+        if (index === 0) {
+          return <LargeCard key={article.id} article={article} />
+        }
+        // Rest are medium cards
+        return <MediumCard key={article.id} article={article} />
+      })}
+
+      {/* Articles without images - small text-only cards */}
+      {articlesWithoutImages.map((article) => (
+        <SmallCard key={article.id} article={article} />
+      ))}
     </div>
   )
 }

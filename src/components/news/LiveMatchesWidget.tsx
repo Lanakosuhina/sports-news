@@ -1,7 +1,7 @@
 'use client'
 
 import { SportDBMatch, formatMatchTime, getStatusLabel, getStatusColor } from '@/lib/sportdb'
-import { Clock, Trophy, Zap } from 'lucide-react'
+import { Trophy, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 interface LiveMatchesWidgetProps {

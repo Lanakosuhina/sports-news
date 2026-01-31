@@ -1,6 +1,7 @@
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CookieConsent from '@/components/ui/CookieConsent'
+import StickyAdBanner from '@/components/ui/StickyAdBanner'
 
 export default async function MainLayout({
   children,
@@ -13,6 +14,7 @@ export default async function MainLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <CookieConsent />
+      <StickyAdBanner />
     </div>
   )
 }

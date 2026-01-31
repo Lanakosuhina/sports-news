@@ -168,10 +168,8 @@ export default async function CategoryPage({
     const bookmakers = await getBookmakers()
     const tags = await getTags()
 
-    // Filter for Winline and BetBoom (first and last apps from the screenshot)
-    const appBookmakers = bookmakers.filter(b =>
-      b.slug === 'winline' || b.slug === 'betboom'
-    )
+    // Show all bookmakers with apps
+    const appBookmakers = bookmakers
 
     return (
       <div className="bg-slate-50 min-h-screen">
@@ -381,6 +379,144 @@ export default async function CategoryPage({
               </h2>
 
               <BookmakersTable bookmakers={bookmakers} title="" />
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Sidebar popularArticles={[]} tags={tags} />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Bonus page template - No deposit bonuses
+  if (slug === 'bez-depozita') {
+    const tags = await getTags()
+    const now = new Date()
+    const updateDate = now.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    return (
+      <div className="bg-slate-50 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+            <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
+            <span>/</span>
+            <Link href="/category/bonusyi" className="hover:text-slate-900 transition">БОНУСЫ</Link>
+            <span>/</span>
+            <span className="text-slate-900">БЕЗ ДЕПОЗИТА</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm">
+                <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
+
+                <h1 className="text-3xl md:text-4xl font-bold mb-6">Бонусы без депозита БК</h1>
+
+                <p className="text-slate-600 leading-relaxed mb-8">
+                  Бездепозитные бонусы — редкая акция, позволяющая игрокам делать ставки без внесения средств на счёт.
+                  Чаще всего такие предложения направлены на новых пользователей.
+                </p>
+
+                {/* Bonus Table Header */}
+                <div className="border-b border-slate-200 pb-3 mb-4">
+                  <div className="grid grid-cols-12 gap-4 text-sm text-slate-500">
+                    <div className="col-span-4">Букмекер</div>
+                    <div className="col-span-2">Сумма</div>
+                    <div className="col-span-4">Номинал и условия</div>
+                    <div className="col-span-2"></div>
+                  </div>
+                </div>
+
+                {/* Empty state / Placeholder */}
+                <div className="py-12 text-center text-slate-400">
+                  <p>Список бонусов без депозита будет добавлен позже</p>
+                </div>
+
+                {/* Footer note */}
+                <p className="text-sm text-slate-500 mt-8 pt-4 border-t border-slate-200">
+                  *Дополнительные средства выдаются в рамках выполнения цепочки заданий.
+                </p>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Sidebar popularArticles={[]} tags={tags} />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Bonus page template - Freebet
+  if (slug === 'fribet') {
+    const tags = await getTags()
+    const now = new Date()
+    const updateDate = now.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    return (
+      <div className="bg-slate-50 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+            <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
+            <span>/</span>
+            <Link href="/category/bonusyi" className="hover:text-slate-900 transition">БОНУСЫ</Link>
+            <span>/</span>
+            <span className="text-slate-900">ФРИБЕТ</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm">
+                <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
+
+                <h1 className="text-3xl md:text-4xl font-bold mb-6">Фрибеты от букмекеров</h1>
+
+                <p className="text-slate-600 leading-relaxed mb-8">
+                  Фрибет — это бесплатная ставка, которую букмекер дарит игроку в качестве бонуса.
+                  Фрибеты позволяют делать ставки без риска потери собственных средств.
+                </p>
+
+                {/* Bonus Table Header */}
+                <div className="border-b border-slate-200 pb-3 mb-4">
+                  <div className="grid grid-cols-12 gap-4 text-sm text-slate-500">
+                    <div className="col-span-4">Букмекер</div>
+                    <div className="col-span-2">Сумма</div>
+                    <div className="col-span-4">Номинал и условия</div>
+                    <div className="col-span-2"></div>
+                  </div>
+                </div>
+
+                {/* Empty state / Placeholder */}
+                <div className="py-12 text-center text-slate-400">
+                  <p>Список фрибетов будет добавлен позже</p>
+                </div>
+
+                {/* Footer note */}
+                <p className="text-sm text-slate-500 mt-8 pt-4 border-t border-slate-200">
+                  *Условия получения фрибета могут отличаться у разных букмекеров.
+                </p>
+              </div>
             </div>
 
             {/* Sidebar */}

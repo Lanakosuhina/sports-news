@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import ArticleCard from '@/components/news/ArticleCard'
 import Sidebar from '@/components/layout/Sidebar'
+import AdZone from '@/components/ui/AdZone'
 import { formatDate, getImageUrl } from '@/lib/utils'
 import { ArticleWithRelations } from '@/types'
-import { Calendar, User, Eye, Tag, Share2, Facebook, Twitter } from 'lucide-react'
+import { Calendar, User, Tag } from 'lucide-react'
+import { timeAgo } from '@/lib/utils'
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
@@ -170,8 +171,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     getTags(),
   ])
 
-  const shareUrl = `${process.env.NEXTAUTH_URL || ''}/article/${slug}`
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -219,10 +218,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 <span>{formatDate(article.publishedAt || article.createdAt)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Eye className="w-4 h-4" />
-                <span>{article.views.toLocaleString()} просмотров</span>
               </div>
             </div>
 
@@ -304,10 +299,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
 
           {/* Ad Zone - Top */}
-          <div className="bg-slate-100 rounded-xl p-4 text-center mb-6">
-            <div className="bg-slate-200 h-[90px] rounded-lg flex items-center justify-center text-slate-400">
-              <span>Реклама 728x90</span>
-            </div>
+          <div className="mb-6">
+            <AdZone size="leaderboard" imageSrc="/uploads/two.png" link="https://fonbet.ru" />
           </div>
 
           {/* Article Content */}
@@ -350,39 +343,60 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 />
               </div>
             </div>
-          )}
-
-          {/* Share Buttons */}
-          <div className="flex items-center gap-4 py-6 border-t border-b">
-            <span className="flex items-center gap-2 text-slate-600">
-              <Share2 className="w-5 h-5" />
-              Поделиться:
-            </span>
-            <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              <Facebook className="w-5 h-5" />
-            </a>
-            <a
-              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(article.title)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition"
-            >
-              <Twitter className="w-5 h-5" />
-            </a>
-          </div>
+          )}       
 
           {/* Related Articles */}
           {relatedArticles.length > 0 && (
             <section className="mt-8">
               <h2 className="text-2xl font-bold mb-6">Похожие статьи</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {relatedArticles.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Articles with images - medium cards */}
+                {relatedArticles.filter(a => a.featuredImage).map((relatedArticle) => (
+                  <Link
+                    key={relatedArticle.id}
+                    href={`/article/${relatedArticle.slug}`}
+                    className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <Image
+                        src={getImageUrl(relatedArticle.featuredImage)}
+                        alt={relatedArticle.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <span className="absolute top-3 left-3 bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+                        {relatedArticle.category.name}
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 mb-2">
+                        {relatedArticle.title}
+                      </h3>
+                      <div className="text-xs text-slate-500">
+                        <span>{timeAgo(relatedArticle.publishedAt || relatedArticle.createdAt)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+                {/* Articles without images - small text-only cards */}
+                {relatedArticles.filter(a => !a.featuredImage).map((relatedArticle) => (
+                  <Link
+                    key={relatedArticle.id}
+                    href={`/article/${relatedArticle.slug}`}
+                    className="group flex gap-4 bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-block text-blue-500 text-xs font-medium mb-1">
+                        {relatedArticle.category.name}
+                      </span>
+                      <h4 className="font-semibold text-slate-900 group-hover:text-blue-500 transition line-clamp-2 text-sm mb-2">
+                        {relatedArticle.title}
+                      </h4>
+                      <div className="text-xs text-slate-500">
+                        <span>{timeAgo(relatedArticle.publishedAt || relatedArticle.createdAt)}</span>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </section>

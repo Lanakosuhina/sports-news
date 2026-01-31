@@ -46,7 +46,11 @@ export function truncate(text: string, length: number): string {
 }
 
 export function getImageUrl(path: string | null | undefined): string {
-  if (!path) return '/placeholder.jpg'
+  if (!path) return '/placeholder.svg'
   if (path.startsWith('http')) return path
   return path.startsWith('/') ? path : `/${path}`
+}
+
+export function hasImage(path: string | null | undefined): boolean {
+  return !!path && path.trim() !== ''
 }

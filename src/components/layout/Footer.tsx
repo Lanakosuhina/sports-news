@@ -1,10 +1,9 @@
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Youtube } from 'lucide-react'
 
 const mainCategories = [
   { name: 'Букмекеры', href: '/category/bukmekeryi' },
   { name: 'Бонусы', href: '/category/bonusyi' },
-  { name: 'Центр ставок', href: '/category/tsentr-stavok' },
+  { name: 'Центр ставок', href: '/matches' },
   { name: 'Новости', href: '/category/novosti' },
 ]
 
@@ -66,7 +65,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div className="min-w-0">
+          {/* <div className="min-w-0">
             <h3 className="text-lg font-semibold mb-4">Рассылка</h3>
             <p className="text-slate-400 mb-4">
               Подпишитесь, чтобы получать последние спортивные новости на вашу почту.
@@ -84,7 +83,7 @@ export default function Footer() {
                 Подписаться
               </button>
             </form>
-          </div>
+          </div> */}
         </div>
 
         {/* Legal information */}

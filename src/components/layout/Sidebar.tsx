@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArticleWithRelations, StandingWithTeam, MatchWithTeams } from '@/types'
-import { formatDate, timeAgo, getImageUrl } from '@/lib/utils'
-import { Calendar, TrendingUp, Trophy, Eye } from 'lucide-react'
+import { formatDate, getImageUrl } from '@/lib/utils'
+import { Calendar, Trophy } from 'lucide-react'
+import AdZone from '@/components/ui/AdZone'
 
 interface SidebarProps {
   popularArticles?: ArticleWithRelations[]
@@ -23,11 +24,10 @@ export default function Sidebar({
     <aside className="space-y-6">
       {/* Ad Zone - Top */}
       {showAds && (
-        <div className="bg-slate-100 rounded-xl p-4 text-center">
-          <div className="bg-slate-200 h-[250px] rounded-lg flex items-center justify-center text-slate-400">
-            <span>Реклама 300x250</span>
-          </div>
-        </div>
+        <AdZone
+          size="medium-rectangle"
+          imageSrc="/uploads/pic.png"
+        />
       )}
 
       {/* Upcoming Matches */}
@@ -146,13 +146,6 @@ export default function Sidebar({
               </tbody>
             </table>
           </div>
-          {standings.length > 8 && (
-            <div className="px-4 py-2 border-t border-slate-100 text-center">
-              <Link href="/standings" className="text-sm text-blue-500 hover:text-blue-600 font-medium">
-                Показать всё
-              </Link>
-            </div>
-          )}
         </div>
       )}
 
@@ -176,11 +169,11 @@ export default function Sidebar({
 
       {/* Ad Zone - Bottom */}
       {showAds && (
-        <div className="bg-slate-100 rounded-xl p-4 text-center sticky top-20">
-          <div className="bg-slate-200 h-[600px] rounded-lg flex items-center justify-center text-slate-400">
-            <span>Реклама 300x600</span>
-          </div>
-        </div>
+        <AdZone
+          size="half-page"
+          imageSrc="/uploads/three.png"
+          sticky
+        />
       )}
     </aside>
   )

@@ -162,13 +162,24 @@ model Standing {
 }
 
 model AdZone {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  code      String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  placement   String   @default("sidebar-top") // sidebar-top, sidebar-bottom, article-top, article-bottom, header, footer
+  size        String   @default("medium-rectangle") // medium-rectangle, half-page, leaderboard, etc.
+  imageUrl    String?
+  linkUrl     String?
+  code        String?  // For external ad code (Google Ads, etc.)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([placement, isActive])
 }
 
 model Page {

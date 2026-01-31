@@ -27,8 +27,8 @@ function BookmakerLogo({ bookmaker }: { bookmaker: Bookmaker }) {
 
   if (!bookmaker.logo || hasError) {
     return (
-      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-white font-bold text-sm md:text-lg">
+      <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center flex-shrink-0">
+        <span className="text-white font-bold text-lg md:text-xl">
           {bookmaker.name.charAt(0)}
         </span>
       </div>
@@ -36,12 +36,12 @@ function BookmakerLogo({ bookmaker }: { bookmaker: Bookmaker }) {
   }
 
   return (
-    <div className="w-10 h-10 md:w-12 md:h-12 relative flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden">
+    <div className="w-12 h-12 md:w-14 md:h-14 relative flex-shrink-0 bg-white rounded-xl overflow-hidden border border-slate-100">
       <Image
         src={bookmaker.logo}
         alt={bookmaker.name}
         fill
-        className="object-contain p-1"
+        className="object-contain p-2"
         unoptimized
         onError={() => setHasError(true)}
       />
@@ -68,12 +68,12 @@ export default function BookmakersTable({
         {bookmakers.map((bookmaker) => (
           <div
             key={bookmaker.id}
-            className="flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition"
+            className="flex items-center justify-between p-4 hover:bg-slate-50 transition"
           >
             {/* Logo & Name */}
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-3">
               <BookmakerLogo bookmaker={bookmaker} />
-              <span className="font-semibold text-slate-900 text-sm md:text-base">{bookmaker.name}</span>
+              <span className="font-semibold text-slate-900 text-base">{bookmaker.name}</span>
             </div>
 
             {/* Play/Go Button */}
@@ -81,7 +81,7 @@ export default function BookmakersTable({
               href={linkToPage ? `/bookmaker/${bookmaker.slug}` : bookmaker.link}
               target={linkToPage ? undefined : "_blank"}
               rel={linkToPage ? undefined : "noopener noreferrer"}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 md:px-6 py-2 md:py-2.5 rounded-lg transition text-sm md:text-base whitespace-nowrap"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap"
             >
               {buttonText}
             </Link>

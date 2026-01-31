@@ -27,6 +27,31 @@ interface RichTextEditorProps {
   onChange: (content: string) => void
 }
 
+function ToolbarButton({
+  onClick,
+  active,
+  children,
+  title,
+}: {
+  onClick: () => void
+  active?: boolean
+  children: React.ReactNode
+  title: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-2 rounded hover:bg-slate-100 transition ${
+        active ? 'bg-slate-200 text-blue-500' : 'text-slate-600'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function RichTextEditor({
   content,
   onChange,
@@ -88,29 +113,6 @@ export default function RichTextEditor({
       editor.chain().focus().setYoutubeVideo({ src: url }).run()
     }
   }
-
-  const ToolbarButton = ({
-    onClick,
-    active,
-    children,
-    title,
-  }: {
-    onClick: () => void
-    active?: boolean
-    children: React.ReactNode
-    title: string
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`p-2 rounded hover:bg-slate-100 transition ${
-        active ? 'bg-slate-200 text-blue-500' : 'text-slate-600'
-      }`}
-    >
-      {children}
-    </button>
-  )
 
   return (
     <div className="border border-slate-300 rounded-lg overflow-hidden">

@@ -46,9 +46,6 @@ const navigation: NavItem[] = [
         children: [
           { name: 'Все матчи футбола', href: '/matches/futbol' },
           { name: 'Лига чемпионов', href: '/matches/futbol/liga-chempionov' },
-          { name: 'Лига Европы', href: '/matches/futbol/liga-evropyi' },
-          { name: 'РПЛ', href: '/matches/futbol/rpl' },
-          { name: 'Кубок России', href: '/matches/futbol/kubok-rossii' },
           { name: 'АПЛ', href: '/matches/futbol/apl' },
           { name: 'Ла Лига', href: '/matches/futbol/la-liga' },
           { name: 'Серия А', href: '/matches/futbol/seriya-a' },
@@ -72,8 +69,12 @@ const navigation: NavItem[] = [
           { name: 'Все матчи тенниса', href: '/matches/tennis' },
           { name: 'Australian Open', href: '/matches/tennis/australian-open' },
           { name: 'Roland Garros', href: '/matches/tennis/roland-garros' },
-          { name: 'Уимблдон', href: '/matches/tennis/uimbldon' },
+          { name: 'Уимблдон', href: '/matches/tennis/wimbledon' },
           { name: 'US Open', href: '/matches/tennis/us-open' },
+          { name: 'Indian Wells', href: '/matches/tennis/indian-wells' },
+          { name: 'Miami Open', href: '/matches/tennis/miami-open' },
+          { name: 'Madrid Open', href: '/matches/tennis/madrid-open' },
+          { name: 'Italian Open', href: '/matches/tennis/italian-open' },
         ]
       },
     ]
@@ -177,7 +178,9 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentDate, setCurrentDate] = useState('')
 
+  // Set date on client side only to avoid hydration mismatch
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentDate(new Date().toLocaleDateString('ru-RU', {
       weekday: 'long',
       month: 'long',

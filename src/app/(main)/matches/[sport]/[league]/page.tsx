@@ -6,6 +6,8 @@ import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
 import { ChevronLeft, Trophy } from 'lucide-react'
 import { getFootballMatches, getHockeyMatches, SportDBMatch } from '@/lib/sportdb'
+import { fetchAllTennisEvents, fetchTournamentEvents, OddsEvent, TOURNAMENT_SEASONS } from '@/lib/odds-api'
+import { Calendar } from 'lucide-react'
 
 interface LeagueMatchesPageProps {
   params: Promise<{ sport: string; league: string }>
@@ -21,9 +23,6 @@ const sportConfig: Record<string, { name: string; apiSport: string }> = {
 const leagueConfig: Record<string, { name: string; keywords: string[] }> = {
   // Football leagues
   'liga-chempionov': { name: 'Лига чемпионов', keywords: ['Champions League', 'UEFA Champions'] },
-  'liga-evropyi': { name: 'Лига Европы', keywords: ['Europa League', 'UEFA Europa'] },
-  'rpl': { name: 'РПЛ', keywords: ['Russian Premier League', 'Russia: Premier'] },
-  'kubok-rossii': { name: 'Кубок России', keywords: ['Russian Cup', 'Russia: Cup'] },
   'apl': { name: 'АПЛ', keywords: ['Premier League', 'England: Premier'] },
   'la-liga': { name: 'Ла Лига', keywords: ['La Liga', 'Spain: La Liga'] },
   'seriya-a': { name: 'Серия А', keywords: ['Serie A', 'Italy: Serie A'] },
@@ -32,11 +31,59 @@ const leagueConfig: Record<string, { name: string; keywords: string[] }> = {
   // Hockey leagues
   'khl': { name: 'КХЛ', keywords: ['KHL', 'Russia: KHL'] },
   'nhl': { name: 'НХЛ', keywords: ['NHL', 'USA: NHL'] },
-  // Tennis tournaments
+  // Tennis tournaments - Grand Slams
   'australian-open': { name: 'Australian Open', keywords: ['Australian Open'] },
   'roland-garros': { name: 'Roland Garros', keywords: ['Roland Garros', 'French Open'] },
-  'uimbldon': { name: 'Уимблдон', keywords: ['Wimbledon'] },
+  'wimbledon': { name: 'Уимблдон', keywords: ['Wimbledon'] },
   'us-open': { name: 'US Open', keywords: ['US Open'] },
+  // Tennis tournaments - Masters 1000
+  'indian-wells': { name: 'Indian Wells', keywords: ['Indian Wells'] },
+  'miami-open': { name: 'Miami Open', keywords: ['Miami Open'] },
+  'monte-carlo': { name: 'Monte-Carlo Masters', keywords: ['Monte-Carlo', 'Monte Carlo'] },
+  'madrid-open': { name: 'Madrid Open', keywords: ['Madrid Open'] },
+  'italian-open': { name: 'Italian Open', keywords: ['Italian Open', 'Rome'] },
+  'canadian-open': { name: 'Canadian Open', keywords: ['Canadian Open'] },
+  'cincinnati-open': { name: 'Cincinnati Open', keywords: ['Cincinnati'] },
+  'shanghai-masters': { name: 'Shanghai Masters', keywords: ['Shanghai'] },
+  'paris-masters': { name: 'Paris Masters', keywords: ['Paris Masters'] },
+  // Tennis tournaments - ATP 500
+  'dubai': { name: 'Dubai Tennis', keywords: ['Dubai'] },
+  'qatar-open': { name: 'Qatar Open', keywords: ['Qatar'] },
+  'china-open': { name: 'China Open', keywords: ['China Open'] },
+}
+
+// Convert Odds API events to SportDBMatch format
+function convertOddsEventToMatch(event: OddsEvent): SportDBMatch {
+  return {
+    id: event.id,
+    homeTeam: {
+      name: event.home_team,
+      logo: undefined,
+    },
+    awayTeam: {
+      name: event.away_team,
+      logo: undefined,
+    },
+    homeScore: null,
+    awayScore: null,
+    status: 'scheduled',
+    startTime: event.commence_time,
+    league: {
+      name: event.sport_title,
+      country: undefined,
+    },
+    sport: 'tennis',
+  }
+}
+
+async function getTennisMatches(): Promise<SportDBMatch[]> {
+  try {
+    const events = await fetchAllTennisEvents()
+    return events.map(convertOddsEventToMatch)
+  } catch (error) {
+    console.error('Failed to fetch tennis events:', error)
+    return []
+  }
 }
 
 async function getMatchesBySport(sport: string): Promise<SportDBMatch[]> {
@@ -48,6 +95,8 @@ async function getMatchesBySport(sport: string): Promise<SportDBMatch[]> {
       return getFootballMatches()
     case 'hockey':
       return getHockeyMatches()
+    case 'tennis':
+      return getTennisMatches()
     default:
       return []
   }
@@ -69,6 +118,16 @@ async function getTags() {
       take: 15,
     })
   } catch {
+    return []
+  }
+}
+
+async function getTennisTournamentMatches(tournamentSlug: string): Promise<SportDBMatch[]> {
+  try {
+    const events = await fetchTournamentEvents(tournamentSlug)
+    return events.map(convertOddsEventToMatch)
+  } catch (error) {
+    console.error(`Failed to fetch tennis tournament ${tournamentSlug}:`, error)
     return []
   }
 }
@@ -115,15 +174,22 @@ export default async function LeagueMatchesPage({ params }: LeagueMatchesPagePro
     notFound()
   }
 
-  const [allMatches, tags] = await Promise.all([
-    getMatchesBySport(sport),
-    getTags(),
-  ])
+  // Fetch tags
+  const tags = await getTags()
 
-  // Filter matches for specific league
-  const leagueMatches = leagueConf
-    ? filterMatchesByLeague(allMatches, league)
-    : allMatches
+  // For tennis tournaments, fetch directly from Odds API
+  let leagueMatches: SportDBMatch[] = []
+
+  if (sportConf.apiSport === 'tennis' && leagueConf) {
+    // Direct tournament fetch for tennis
+    leagueMatches = await getTennisTournamentMatches(league)
+  } else {
+    const allMatches = await getMatchesBySport(sport)
+    // Filter matches for specific league
+    leagueMatches = leagueConf
+      ? filterMatchesByLeague(allMatches, league)
+      : allMatches
+  }
 
   const leagueName = leagueConf?.name || league.replace(/-/g, ' ')
 
@@ -179,9 +245,32 @@ export default async function LeagueMatchesPage({ params }: LeagueMatchesPagePro
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">
                   Матчей в {leagueName} пока нет
                 </h3>
-                <p className="text-slate-500 mb-4">
-                  На данный момент нет активных матчей в этом турнире
-                </p>
+                {sportConf.apiSport === 'tennis' && TOURNAMENT_SEASONS[league] ? (
+                  <>
+                    <p className="text-slate-500 mb-4">
+                      Турнир проводится в другое время года
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 inline-block">
+                      <div className="flex items-center gap-2 text-blue-700 font-medium mb-1">
+                        <Calendar className="w-5 h-5" />
+                        <span>Сезон турнира</span>
+                      </div>
+                      <p className="text-blue-600 text-lg font-semibold">
+                        {TOURNAMENT_SEASONS[league].period}
+                      </p>
+                      <p className="text-blue-500 text-sm">
+                        ({TOURNAMENT_SEASONS[league].months})
+                      </p>
+                    </div>
+                    <p className="text-slate-400 text-sm mb-4">
+                      Матчи появятся когда турнир начнётся
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-slate-500 mb-4">
+                    На данный момент нет активных матчей в этом турнире
+                  </p>
+                )}
                 <Link
                   href={`/matches/${sport}`}
                   className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition"

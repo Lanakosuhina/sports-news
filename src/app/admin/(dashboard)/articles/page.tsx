@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { formatDateTime } from '@/lib/utils'
-import { Plus, Search, Eye, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, Eye, Edit } from 'lucide-react'
 import Pagination from '@/components/ui/Pagination'
 import DeleteArticleButton from '@/components/admin/DeleteArticleButton'
 

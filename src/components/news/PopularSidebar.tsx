@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { TrendingUp, Eye, ChevronRight } from 'lucide-react'
+import { TrendingUp, ChevronRight } from 'lucide-react'
 import { ArticleWithRelations } from '@/types'
 import { timeAgo } from '@/lib/utils'
 
@@ -33,13 +33,9 @@ export default function PopularSidebar({ articles, title = 'Популярное
               <h4 className="font-medium text-slate-900 group-hover:text-blue-500 transition line-clamp-2 text-sm">
                 {article.title}
               </h4>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1">
                 <span className="text-xs text-slate-400">
                   {timeAgo(article.publishedAt || article.createdAt)}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-slate-400">
-                  <Eye className="w-3 h-3" />
-                  {article.views.toLocaleString()}
                 </span>
               </div>
             </div>

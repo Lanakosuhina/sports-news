@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bell, Download, X } from 'lucide-react'
+import { Bell, Download } from 'lucide-react'
 
 interface Notification {
   id: string
@@ -17,25 +17,32 @@ export default function ImportNotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
+    let cancelled = false
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/import/notifications')
+        if (res.ok && !cancelled) {
+          const data = await res.json()
+          setNotifications(data.notifications)
+          setPendingCount(data.pendingCount)
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to fetch notifications:', error)
+        }
+      }
+    }
+
     fetchNotifications()
 
     // Poll for new notifications every 60 seconds
     const interval = setInterval(fetchNotifications, 60000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch('/api/import/notifications')
-      if (res.ok) {
-        const data = await res.json()
-        setNotifications(data.notifications)
-        setPendingCount(data.pendingCount)
-      }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
     }
-  }
+  }, [])
 
   const markAllAsRead = async () => {
     try {

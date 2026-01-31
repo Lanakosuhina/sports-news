@@ -19,12 +19,16 @@ import {
   ChevronDown,
   User,
   Download,
+  Trophy,
+  Image,
 } from 'lucide-react'
 
 const menuItems = [
   { href: '/admin', label: 'Панель', icon: LayoutDashboard },
   { href: '/admin/articles', label: 'Статьи', icon: FileText },
+  { href: '/admin/media', label: 'Медиа', icon: Image },
   { href: '/admin/import', label: 'Импорт новостей', icon: Download },
+  { href: '/admin/import/football', label: 'Футбол API', icon: Trophy },
   { href: '/admin/categories', label: 'Категории', icon: FolderOpen },
   { href: '/admin/tags', label: 'Теги', icon: Tags },
   { href: '/admin/ads', label: 'Рекламные зоны', icon: Megaphone },

@@ -6,7 +6,8 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Category, Tag, League, Article } from '@prisma/client'
 import { slugify, getImageUrl } from '@/lib/utils'
-import { Save, Eye, X, Upload, Plus } from 'lucide-react'
+import { Save, Eye, X, Upload, Plus, Download } from 'lucide-react'
+import ImageDownloadModal from './ImageDownloadModal'
 
 const RichTextEditor = dynamic(() => import('./RichTextEditor'), {
   ssr: false,
@@ -54,6 +55,7 @@ export default function ArticleForm({
     article?.tags.map((t) => t.id) || []
   )
   const [newTag, setNewTag] = useState('')
+  const [showDownloadModal, setShowDownloadModal] = useState<string | null>(null)
 
   const handleTitleChange = (title: string) => {
     setFormData((prev) => ({
@@ -457,22 +459,33 @@ export default function ArticleForm({
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="font-semibold text-slate-900 mb-4">Главное изображение</h3>
             {formData.featuredImage ? (
-              <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
+              <div className="relative aspect-video rounded-lg overflow-hidden mb-4 group">
                 <Image
                   src={getImageUrl(formData.featuredImage)}
                   alt="Featured"
                   fill
                   className="object-cover"
                 />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({ ...prev, featuredImage: '' }))
-                  }
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowDownloadModal(formData.featuredImage)}
+                    className="p-1.5 bg-blue-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-blue-600"
+                    title="Скачать в разных размерах"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, featuredImage: '' }))
+                    }
+                    className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                    title="Удалить"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ) : null}
             <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 transition">
@@ -507,7 +520,7 @@ export default function ArticleForm({
                 {formData.gallery.map((image, index) => (
                   <div
                     key={index}
-                    className="relative aspect-square rounded-lg overflow-hidden"
+                    className="relative aspect-square rounded-lg overflow-hidden group"
                   >
                     <Image
                       src={getImageUrl(image)}
@@ -515,13 +528,24 @@ export default function ArticleForm({
                       fill
                       className="object-cover"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeGalleryImage(index)}
-                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                    <div className="absolute top-1 right-1 flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setShowDownloadModal(image)}
+                        className="p-1 bg-blue-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-blue-600"
+                        title="Скачать"
+                      >
+                        <Download className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(index)}
+                        className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                        title="Удалить"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -554,6 +578,14 @@ export default function ArticleForm({
           </div>
         </div>
       </div>
+
+      {/* Image Download Modal */}
+      {showDownloadModal && (
+        <ImageDownloadModal
+          imagePath={showDownloadModal}
+          onClose={() => setShowDownloadModal(null)}
+        />
+      )}
     </form>
   )
 }
