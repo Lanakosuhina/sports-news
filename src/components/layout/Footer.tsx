@@ -92,6 +92,10 @@ export default function Footer() {
             <p>
             Зарегистрировано Федеральной службой по надзору в сфере связи, информационных технологий и массовых коммуникаций (Роскомнадзор) 23.12.2025. Свидетельство о регистрации СМИ «Тренды спорта» ЭЛ № ФС 77 - 90561
             </p>
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+              <p>Главный редактор — Олег Георгиевич Багдасаров</p>
+              <p>Телефон главного редактора: </p>
+            </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
               <p>&copy; {new Date().getFullYear()} Тренды спорта. Все права защищены.</p>
               <div className="flex items-center gap-2 text-blue-500 font-medium">
