@@ -47,9 +47,6 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 # NextAuth.js (авторизация)
 NEXTAUTH_SECRET="ваш-секретный-ключ-минимум-32-символа"
 NEXTAUTH_URL="https://ваш-домен.ru"
-
-# Cron-задачи (опционально)
-CRON_SECRET="секрет-для-cron-эндпоинта"
 ```
 
 **Генерация NEXTAUTH_SECRET:**
@@ -75,7 +72,7 @@ npm run db:seed
 
 ```bash
 # Восстановить базу данных
-psql -U postgres -d trendy_sporta < database_backup.sql
+psql -U postgres -d sports_news < database_backup.sql
 ```
 
 ### 4. Сборка и запуск
@@ -138,45 +135,78 @@ src/
 - **Статьи** — создание, редактирование, публикация новостей
 - **Категории** — управление разделами сайта
 - **Теги** — управление тегами для статей
-- **Медиатека** — загрузка и управление изображениями
+- **Букмекеры** — управление рейтингом букмекеров (с гибкими полями)
 - **Страницы** — статические страницы (О нас, Контакты, Политики)
-- **Импорт** — полуавтоматический импорт новостей из RSS
-- **Реклама** — управление рекламными зонами
+- **Реклама** — управление рекламными зонами с загрузкой баннеров
+- **Пользователи** — управление администраторами
+- **Настройки** — настройки сайта
 
 ## Деплой на сервер
 
-### Vercel (рекомендуется)
+### 1. Подготовка сервера
 
-1. Подключите репозиторий к Vercel
-2. Добавьте переменные окружения в настройках проекта
-3. Vercel автоматически соберёт и развернёт проект
+```bash
+# Установка Node.js (Ubuntu/Debian)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
 
-### VPS / Dedicated Server
+# Установка PostgreSQL
+sudo apt install postgresql postgresql-contrib
 
-1. Клонируйте репозиторий на сервер
-2. Установите Node.js 18+ и PostgreSQL
-3. Настройте `.env`
-4. Выполните сборку: `npm run build`
-5. Используйте PM2 для запуска:
+# Создание базы данных
+sudo -u postgres psql
+CREATE DATABASE sports_news;
+CREATE USER sports_user WITH ENCRYPTED PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE sports_news TO sports_user;
+\q
+```
+
+### 2. Развёртывание приложения
+
+```bash
+# Клонирование/копирование проекта
+cd /var/www
+# ... скопируйте проект сюда ...
+
+# Установка зависимостей
+npm install
+
+# Настройка переменных окружения
+cp .env.example .env
+nano .env  # Отредактируйте значения
+
+# Сборка
+npm run build
+```
+
+### 3. Запуск через PM2
 
 ```bash
 # Установка PM2
 npm install -g pm2
 
 # Запуск приложения
-pm2 start npm --name "trendy-sporta" -- start
+pm2 start npm --name "sports-news" -- start
 
 # Автозапуск при перезагрузке
 pm2 startup
 pm2 save
+
+# Полезные команды PM2
+pm2 status           # Статус приложений
+pm2 logs sports-news # Логи приложения
+pm2 restart sports-news # Перезапуск
 ```
 
-### Nginx (reverse proxy)
+### 4. Настройка Nginx (reverse proxy)
 
 ```nginx
 server {
     listen 80;
-    server_name ваш-домен.ru;
+    server_name ваш-домен.ru www.ваш-домен.ru;
+
+    # Максимальный размер загружаемых файлов
+    client_max_body_size 10M;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -189,36 +219,48 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
     }
+
+    # Кэширование статики
+    location /_next/static {
+        proxy_pass http://localhost:3000;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location /uploads {
+        alias /var/www/sports-news/public/uploads;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
 }
 ```
 
-## SSL-сертификат (Let's Encrypt)
+```bash
+# Активация конфигурации
+sudo ln -s /etc/nginx/sites-available/sports-news /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 5. SSL-сертификат (Let's Encrypt)
 
 ```bash
 # Установка Certbot
 sudo apt install certbot python3-certbot-nginx
 
 # Получение сертификата
-sudo certbot --nginx -d ваш-домен.ru
-```
-
-## Cron-задачи
-
-Для автоматической проверки RSS-источников добавьте в crontab:
-
-```bash
-# Каждые 30 минут проверять новые статьи
-*/30 * * * * curl -X GET "https://ваш-домен.ru/api/import/cron?secret=ВАШ_CRON_SECRET"
+sudo certbot --nginx -d ваш-домен.ru -d www.ваш-домен.ru
 ```
 
 ## Загрузка изображений
 
 Изображения загружаются в папку `public/uploads/`. Убедитесь, что:
 - Папка существует и доступна для записи
-- Настроен достаточный лимит на размер загружаемых файлов в Nginx
+- Настроен достаточный лимит на размер загружаемых файлов в Nginx (`client_max_body_size 10M;`)
 
-```nginx
-client_max_body_size 10M;
+```bash
+# Создание папки и установка прав
+mkdir -p public/uploads
+chmod 755 public/uploads
 ```
 
 ## Резервное копирование
@@ -227,10 +269,10 @@ client_max_body_size 10M;
 
 ```bash
 # Создание бэкапа
-pg_dump -U postgres trendy_sporta > backup_$(date +%Y%m%d).sql
+pg_dump -U postgres sports_news > backup_$(date +%Y%m%d).sql
 
 # Восстановление
-psql -U postgres -d trendy_sporta < backup_20240101.sql
+psql -U postgres -d sports_news < backup_20260206.sql
 ```
 
 ### Файлы
@@ -238,6 +280,28 @@ psql -U postgres -d trendy_sporta < backup_20240101.sql
 ```bash
 # Бэкап загруженных изображений
 tar -czf uploads_backup.tar.gz public/uploads/
+```
+
+## Обновление сайта
+
+```bash
+# Остановка приложения
+pm2 stop sports-news
+
+# Обновление кода (git pull или копирование)
+# ...
+
+# Установка новых зависимостей
+npm install
+
+# Применение изменений БД (если есть)
+npm run db:push
+
+# Пересборка
+npm run build
+
+# Запуск
+pm2 start sports-news
 ```
 
 ## Поддержка

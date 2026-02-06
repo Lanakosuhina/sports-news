@@ -300,7 +300,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
           {/* Ad Zone - Top */}
           <div className="mb-6">
-            <AdZone size="leaderboard" imageSrc="/uploads/two.png" link="https://fonbet.ru" />
+            <AdZone size="leaderboard" placement="article-top" />
           </div>
 
           {/* Article Content */}
