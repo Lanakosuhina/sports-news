@@ -208,92 +208,35 @@ model SiteSettings {
   updatedAt       DateTime @updatedAt
 }
 
-// Import System Models
+// Security Models
 
-model ImportSource {
-  id              String          @id @default(cuid())
-  name            String          @unique
-  slug            String          @unique
-  type            ImportType      @default(RSS)
-  url             String
-  feedUrl         String?
-  isActive        Boolean         @default(true)
-  defaultCategory String?
-  checkInterval   Int             @default(30) // minutes
-  lastCheckedAt   DateTime?
-  config          Json?           // Additional source-specific config
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  importedItems   ImportedItem[]
-  importJobs      ImportJob[]
-}
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  userEmail  String?
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entityType String?  // Article, User, Category, etc.
+  entityId   String?
+  details    Json?    // Additional context
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
 
-enum ImportType {
-  RSS
-  API
-  SCRAPER
-}
-
-model ImportedItem {
-  id            String       @id @default(cuid())
-  sourceId      String
-  source        ImportSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  externalId    String       // Original article ID or URL hash
-  externalUrl   String       // Original article URL
-  title         String
-  excerpt       String?
-  content       String?
-  imageUrl      String?
-  publishedAt   DateTime?
-  rawData       Json?        // Store raw parsed data
-  status        ImportStatus @default(PENDING)
-  articleId     String?      // Link to created article if imported
-  importedAt    DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
-  @@unique([sourceId, externalId])
-  @@index([status])
-  @@index([sourceId, createdAt])
-}
-
-enum ImportStatus {
-  PENDING    // Fetched but not reviewed
-  APPROVED   // Ready to import
-  IMPORTED   // Already imported as article
-  SKIPPED    // Admin skipped this item
-  FAILED     // Import failed
-}
-
-model ImportJob {
-  id          String        @id @default(cuid())
-  sourceId    String?
-  source      ImportSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
-  status      JobStatus     @default(PENDING)
-  itemsFound  Int           @default(0)
-  itemsNew    Int           @default(0)
-  error       String?
-  startedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime      @default(now())
-
-  @@index([status])
+  @@index([userId])
+  @@index([action])
   @@index([createdAt])
 }
 
-enum JobStatus {
-  PENDING
-  RUNNING
-  COMPLETED
-  FAILED
-}
-
-model ImportNotification {
+model LoginAttempt {
   id        String   @id @default(cuid())
-  message   String
-  count     Int      @default(0)
-  isRead    Boolean  @default(false)
+  email     String
+  success   Boolean
+  ipAddress String?
+  userAgent String?
   createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ipAddress, createdAt])
 }
 
 // Bookmakers
@@ -303,6 +246,7 @@ model Bookmaker {
   name           String   @unique
   slug           String   @unique
   logo           String?
+  description    String?  // Rich text description
   bonus          String?  // e.g., "10000 ₽"
   bonusLabel     String?  // e.g., "Эксклюзив", "Новым игрокам"
   reviewsCount   Int      @default(0)
@@ -320,6 +264,7 @@ model Bookmaker {
   isActive       Boolean  @default(true)
   order          Int      @default(0)
   ratingOrder    Int      @default(0)
+  customFields   Json?    // Flexible key-value pairs for extensible data
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

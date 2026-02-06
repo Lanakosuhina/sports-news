@@ -1,9 +1,11 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { FileText, FolderOpen, Tags, Eye, TrendingUp, Plus } from 'lucide-react'
+import { unstable_cache } from 'next/cache'
 
-async function getStats() {
-  try {
+// Cached stats function - revalidates every 60 seconds
+const getCachedStats = unstable_cache(
+  async () => {
     const [
       totalArticles,
       publishedArticles,
@@ -28,6 +30,14 @@ async function getStats() {
       totalTags,
       totalViews: totalViews._sum.views || 0,
     }
+  },
+  ['admin-dashboard-stats'],
+  { revalidate: 60, tags: ['dashboard-stats'] }
+)
+
+async function getStats() {
+  try {
+    return await getCachedStats()
   } catch {
     return {
       totalArticles: 0,

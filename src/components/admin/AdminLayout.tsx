@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import ImportNotificationBell from './ImportNotificationBell'
 import {
   LayoutDashboard,
   FileText,
@@ -18,21 +17,21 @@ import {
   X,
   ChevronDown,
   User,
-  Download,
   Trophy,
-  Image,
+  Users,
+  Building2,
 } from 'lucide-react'
 
 const menuItems = [
   { href: '/admin', label: 'Панель', icon: LayoutDashboard },
   { href: '/admin/articles', label: 'Статьи', icon: FileText },
-  { href: '/admin/media', label: 'Медиа', icon: Image },
-  { href: '/admin/import', label: 'Импорт новостей', icon: Download },
-  { href: '/admin/import/football', label: 'Футбол API', icon: Trophy },
+  { href: '/admin/football', label: 'Футбол API', icon: Trophy },
   { href: '/admin/categories', label: 'Категории', icon: FolderOpen },
   { href: '/admin/tags', label: 'Теги', icon: Tags },
+  { href: '/admin/bookmakers', label: 'Букмекеры', icon: Building2 },
   { href: '/admin/ads', label: 'Рекламные зоны', icon: Megaphone },
   { href: '/admin/pages', label: 'Страницы', icon: FileCode },
+  { href: '/admin/users', label: 'Пользователи', icon: Users },
   { href: '/admin/settings', label: 'Настройки', icon: Settings },
 ]
 
@@ -131,9 +130,6 @@ export default function AdminLayout({
 
             {/* Spacer */}
             <div className="flex-1" />
-
-            {/* Notifications */}
-            <ImportNotificationBell />
 
             {/* User menu */}
             <div className="relative">

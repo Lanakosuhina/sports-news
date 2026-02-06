@@ -341,19 +341,36 @@ export default function AdsPage() {
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Изображение
+                Изображение баннера
               </label>
-              <div className="flex gap-4 items-start">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, imageUrl: e.target.value }))
+              <div className="space-y-3">
+                {/* Upload Zone */}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.add('border-blue-500', 'bg-blue-50')
+                  }}
+                  onDragLeave={(e) => {
+                    e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50')
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50')
+                    const file = e.dataTransfer.files?.[0]
+                    if (file && file.type.startsWith('image/')) {
+                      const dataTransfer = new DataTransfer()
+                      dataTransfer.items.add(file)
+                      if (fileInputRef.current) {
+                        fileInputRef.current.files = dataTransfer.files
+                        handleImageUpload({ target: { files: dataTransfer.files } } as React.ChangeEvent<HTMLInputElement>)
+                      }
                     }
-                    placeholder="/uploads/ad-image.jpg или внешний URL"
-                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  }}
+                  className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+                    formData.imageUrl ? 'border-green-300 bg-green-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
+                  }`}
+                >
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -361,27 +378,61 @@ export default function AdsPage() {
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="mt-2 flex items-center gap-2 text-sm text-blue-500 hover:text-blue-600"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {uploading ? 'Загрузка...' : 'Загрузить изображение'}
-                  </button>
+
+                  {formData.imageUrl ? (
+                    <div className="space-y-3">
+                      <div className="relative mx-auto w-full max-w-md h-32 rounded-lg overflow-hidden border border-slate-200">
+                        <Image
+                          src={formData.imageUrl}
+                          alt="Preview"
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-green-600">
+                        <ImageIcon className="w-5 h-5" />
+                        <span className="font-medium">Изображение загружено</span>
+                      </div>
+                      <p className="text-sm text-slate-500">
+                        Нажмите или перетащите новое изображение для замены
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="mx-auto w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Upload className={`w-6 h-6 ${uploading ? 'animate-pulse text-blue-400' : 'text-blue-500'}`} />
+                      </div>
+                      <div>
+                        <span className="font-medium text-slate-700">
+                          {uploading ? 'Загрузка...' : 'Загрузите изображение'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-500">
+                        Перетащите файл сюда или нажмите для выбора
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        PNG, JPG, GIF или WEBP до 10MB
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {formData.imageUrl && (
-                  <div className="w-32 h-24 relative rounded-lg overflow-hidden border border-slate-200">
-                    <Image
-                      src={formData.imageUrl}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                )}
+
+                {/* Manual URL Input */}
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-slate-200"></div>
+                  <span className="text-xs text-slate-400 uppercase">или</span>
+                  <div className="flex-1 h-px bg-slate-200"></div>
+                </div>
+                <input
+                  type="text"
+                  value={formData.imageUrl}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, imageUrl: e.target.value }))
+                  }
+                  placeholder="Введите URL изображения"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
               </div>
             </div>
 

@@ -14,7 +14,14 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData()
-    const files = formData.getAll('files') as File[]
+
+    // Support both 'file' (single) and 'files' (multiple) field names
+    let files = formData.getAll('files') as File[]
+    const singleFile = formData.get('file') as File | null
+
+    if (singleFile) {
+      files = [singleFile]
+    }
 
     if (!files || files.length === 0) {
       return NextResponse.json({ message: 'No files provided' }, { status: 400 })
@@ -49,7 +56,11 @@ export async function POST(request: NextRequest) {
       urls.push(`/uploads/${filename}`)
     }
 
-    return NextResponse.json({ urls })
+    // Return both 'url' (single) and 'urls' (array) for compatibility
+    return NextResponse.json({
+      url: urls[0] || null,
+      urls
+    })
   } catch (error) {
     console.error('Error uploading files:', error)
     return NextResponse.json(

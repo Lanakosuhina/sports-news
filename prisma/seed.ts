@@ -486,38 +486,6 @@ async function main() {
 
   console.log('Created site settings')
 
-  // Create import sources
-  const importSources = [
-    {
-      name: 'BBC Sport',
-      slug: 'bbc-sport',
-      type: 'RSS' as const,
-      url: 'https://www.bbc.com/sport',
-      feedUrl: 'https://feeds.bbci.co.uk/sport/rss.xml',
-      defaultCategory: 'futbol',
-      checkInterval: 30,
-    },
-    {
-      name: 'ESPN',
-      slug: 'espn',
-      type: 'RSS' as const,
-      url: 'https://www.espn.com',
-      feedUrl: 'https://www.espn.com/espn/rss/news',
-      defaultCategory: 'futbol',
-      checkInterval: 30,
-    },
-  ]
-
-  for (const source of importSources) {
-    await prisma.importSource.upsert({
-      where: { slug: source.slug },
-      update: {},
-      create: source,
-    })
-  }
-
-  console.log('Created import sources')
-
   // Create bookmakers
   // Order: winline, leon, fonbet, betboom, bettery, betcity, marathon, bet, melbet, balbet, liga stavok, olympbet
   const bookmakersData = [

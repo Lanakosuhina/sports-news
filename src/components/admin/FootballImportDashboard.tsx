@@ -69,7 +69,7 @@ export default function FootballImportDashboard({
     setResults((prev) => ({ ...prev, [leagueSlug]: { success: false, message: 'Синхронизация...' } }))
 
     try {
-      const response = await fetch('/api/import/football', {
+      const response = await fetch('/api/football', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
