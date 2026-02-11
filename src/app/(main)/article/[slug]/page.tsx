@@ -33,14 +33,6 @@ async function getArticle(slug: string): Promise<ArticleWithRelations | null> {
       },
     })
 
-    if (article && article.status === 'PUBLISHED') {
-      // Increment view count
-      await prisma.article.update({
-        where: { id: article.id },
-        data: { views: { increment: 1 } },
-      })
-    }
-
     return article
   } catch {
     return null
@@ -76,7 +68,7 @@ async function getPopularArticles(): Promise<ArticleWithRelations[]> {
   try {
     return await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: { views: 'desc' },
+      orderBy: { publishedAt: 'desc' },
       take: 5,
       include: {
         author: true,

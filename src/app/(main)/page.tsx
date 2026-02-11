@@ -5,7 +5,7 @@ import BookmakersTable from '@/components/bookmakers/BookmakersTable'
 import SelectionsSidebar from '@/components/bookmakers/SelectionsSidebar'
 import PopularSidebar from '@/components/news/PopularSidebar'
 import AboutUsCarousel from '@/components/sections/AboutUsCarousel'
-import MediaCitations from '@/components/sections/MediaCitations'
+// MediaCitations removed
 import { ArticleWithRelations } from '@/types'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
@@ -32,7 +32,7 @@ async function getPopularArticles(): Promise<ArticleWithRelations[]> {
   try {
     return await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: { views: 'desc' },
+      orderBy: { publishedAt: 'desc' },
       take: 5,
       include: {
         author: true,
@@ -135,9 +135,6 @@ export default async function HomePage() {
 
       {/* About Us Carousel */}
       <AboutUsCarousel />
-
-      {/* Media Citations */}
-      <MediaCitations />
 
       {/* Community Stats - temporarily commented out */}
       {/* <CommunityStats /> */}

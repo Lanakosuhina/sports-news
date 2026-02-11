@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Save, ArrowLeft, Upload, Plus, Trash2, GripVertical } from 'lucide-react'
+import { Save, ArrowLeft, Upload, Plus, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 const RichTextEditor = dynamic(() => import('./RichTextEditor'), { ssr: false })
@@ -14,6 +14,12 @@ interface CustomField {
   key: string
   value: string
   type: 'text' | 'url' | 'number' | 'boolean' | 'textarea'
+}
+
+interface TextBlock {
+  id: string
+  title: string
+  content: string
 }
 
 interface BookmakerFormProps {
@@ -39,6 +45,21 @@ interface BookmakerFormProps {
     order: number
     ratingOrder: number
     customFields: Record<string, unknown> | null
+    // Promo fields
+    promoImage: string | null
+    promoTitle: string | null
+    promoDescription: string | null
+    promoCode: string | null
+    promoExpiry: Date | null
+    promoLabel: string | null
+    showOnFribet: boolean
+    showOnBezDepozita: boolean
+    showOnPromokodWinline: boolean
+    showOnPromokodyFonbet: boolean
+    // Page enhancement fields
+    headerBackgroundImage: string | null
+    mobileAppImage: string | null
+    textBlocks: unknown[] | null
   }
 }
 
@@ -80,6 +101,20 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
     isActive: bookmaker?.isActive ?? true,
     order: bookmaker?.order || 0,
     ratingOrder: bookmaker?.ratingOrder || 0,
+    // Promo fields
+    promoImage: bookmaker?.promoImage || '',
+    promoTitle: bookmaker?.promoTitle || '',
+    promoDescription: bookmaker?.promoDescription || '',
+    promoCode: bookmaker?.promoCode || '',
+    promoExpiry: bookmaker?.promoExpiry ? new Date(bookmaker.promoExpiry).toISOString().split('T')[0] : '',
+    promoLabel: bookmaker?.promoLabel || '',
+    showOnFribet: bookmaker?.showOnFribet ?? false,
+    showOnBezDepozita: bookmaker?.showOnBezDepozita ?? false,
+    showOnPromokodWinline: bookmaker?.showOnPromokodWinline ?? false,
+    showOnPromokodyFonbet: bookmaker?.showOnPromokodyFonbet ?? false,
+    // Page enhancement fields
+    headerBackgroundImage: bookmaker?.headerBackgroundImage || '',
+    mobileAppImage: bookmaker?.mobileAppImage || '',
   })
 
   // Initialize custom fields from bookmaker data
@@ -107,6 +142,50 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
   const [customFields, setCustomFields] = useState<CustomField[]>(initializeCustomFields)
   const [showFieldSelector, setShowFieldSelector] = useState(false)
 
+  // Initialize text blocks from bookmaker data
+  const initializeTextBlocks = (): TextBlock[] => {
+    if (!bookmaker?.textBlocks || !Array.isArray(bookmaker.textBlocks)) {
+      return []
+    }
+    return (bookmaker.textBlocks as Array<{ title: string; content: string }>).map(block => ({
+      id: crypto.randomUUID(),
+      title: block.title || '',
+      content: block.content || '',
+    }))
+  }
+
+  const [textBlocks, setTextBlocks] = useState<TextBlock[]>(initializeTextBlocks)
+
+  const addTextBlock = () => {
+    setTextBlocks([
+      ...textBlocks,
+      {
+        id: crypto.randomUUID(),
+        title: '',
+        content: '',
+      },
+    ])
+  }
+
+  const updateTextBlock = (id: string, updates: Partial<TextBlock>) => {
+    setTextBlocks(textBlocks.map(block =>
+      block.id === id ? { ...block, ...updates } : block
+    ))
+  }
+
+  const removeTextBlock = (id: string) => {
+    setTextBlocks(textBlocks.filter(block => block.id !== id))
+  }
+
+  const moveTextBlock = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1
+    if (newIndex < 0 || newIndex >= textBlocks.length) return
+    const newBlocks = [...textBlocks]
+    const [removed] = newBlocks.splice(index, 1)
+    newBlocks.splice(newIndex, 0, removed)
+    setTextBlocks(newBlocks)
+  }
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -133,7 +212,10 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
     })
   }
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'logo' | 'promoImage' | 'headerBackgroundImage' | 'mobileAppImage'
+  ) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -147,10 +229,10 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
       })
       const data = await response.json()
       if (data.url) {
-        setFormData({ ...formData, logo: data.url })
+        setFormData({ ...formData, [field]: data.url })
       }
     } catch (error) {
-      console.error('Error uploading logo:', error)
+      console.error('Error uploading image:', error)
     }
   }
 
@@ -211,6 +293,10 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
           order: parseInt(formData.order.toString()) || 0,
           ratingOrder: parseInt(formData.ratingOrder.toString()) || 0,
           customFields: Object.keys(customFieldsObject).length > 0 ? customFieldsObject : null,
+          promoExpiry: formData.promoExpiry ? new Date(formData.promoExpiry).toISOString() : null,
+          textBlocks: textBlocks.length > 0
+            ? textBlocks.map(({ title, content }) => ({ title, content }))
+            : null,
         }),
       })
 
@@ -508,6 +594,327 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
             </div>
           </div>
 
+          {/* Promo Card Section */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-slate-900">Промо-карточка (Фрибет)</h2>
+              <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded">Для страницы фрибетов</span>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.showOnFribet}
+                    onChange={(e) => setFormData({ ...formData, showOnFribet: e.target.checked })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-slate-700">Фрибет</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.showOnBezDepozita}
+                    onChange={(e) => setFormData({ ...formData, showOnBezDepozita: e.target.checked })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-slate-700">Без депозита</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.showOnPromokodWinline}
+                    onChange={(e) => setFormData({ ...formData, showOnPromokodWinline: e.target.checked })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-slate-700">Промокод Winline</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.showOnPromokodyFonbet}
+                    onChange={(e) => setFormData({ ...formData, showOnPromokodyFonbet: e.target.checked })}
+                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span className="text-slate-700">Промокоды Fonbet</span>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Заголовок промо
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.promoTitle}
+                    onChange={(e) => setFormData({ ...formData, promoTitle: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="ФРИБЕТЫ ДО 15 000₽"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Метка (бейдж)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.promoLabel}
+                    onChange={(e) => setFormData({ ...formData, promoLabel: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Без депозита"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Описание промо
+                </label>
+                <textarea
+                  value={formData.promoDescription}
+                  onChange={(e) => setFormData({ ...formData, promoDescription: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Бездепозитный бонус для новых игроков..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Промокод
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.promoCode}
+                    onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    placeholder="LEGAL15"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Срок действия
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.promoExpiry}
+                    onChange={(e) => setFormData({ ...formData, promoExpiry: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Оставьте пустым для &quot;бессрочно&quot;</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Фоновое изображение промо-карточки
+                </label>
+                <div className="space-y-2">
+                  {formData.promoImage && (
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                      <Image
+                        src={formData.promoImage}
+                        alt="Promo preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
+                    <Upload className="w-5 h-5 text-slate-400" />
+                    <span className="text-sm text-slate-600">Загрузить изображение</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'promoImage')}
+                      className="hidden"
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.promoImage}
+                    onChange={(e) => setFormData({ ...formData, promoImage: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="Или введите URL"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Page Enhancement Section */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-slate-900">Изображения страницы</h2>
+              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded">Страница букмекера</span>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Фон шапки (Header Card)
+                </label>
+                <div className="space-y-2">
+                  {formData.headerBackgroundImage && (
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                      <Image
+                        src={formData.headerBackgroundImage}
+                        alt="Header preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
+                    <Upload className="w-5 h-5 text-slate-400" />
+                    <span className="text-sm text-slate-600">Загрузить изображение</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'headerBackgroundImage')}
+                      className="hidden"
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.headerBackgroundImage}
+                    onChange={(e) => setFormData({ ...formData, headerBackgroundImage: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="Или введите URL"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Фоновое изображение для блока с основной информацией</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Баннер мобильного приложения
+                </label>
+                <div className="space-y-2">
+                  {formData.mobileAppImage && (
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                      <Image
+                        src={formData.mobileAppImage}
+                        alt="Mobile app preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
+                    <Upload className="w-5 h-5 text-slate-400" />
+                    <span className="text-sm text-slate-600">Загрузить изображение</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'mobileAppImage')}
+                      className="hidden"
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.mobileAppImage}
+                    onChange={(e) => setFormData({ ...formData, mobileAppImage: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    placeholder="Или введите URL"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Изображение внутри блока мобильных приложений</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Text Blocks Section */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-slate-900">Текстовые блоки</h2>
+                <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded">Контент страницы</span>
+              </div>
+              <button
+                type="button"
+                onClick={addTextBlock}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+              >
+                <Plus className="w-4 h-4" />
+                Добавить блок
+              </button>
+            </div>
+            <p className="text-sm text-slate-500 mb-4">
+              Добавляйте текстовые блоки с заголовками для создания уникального контента на странице букмекера
+            </p>
+
+            {textBlocks.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 border-2 border-dashed rounded-lg">
+                <p>Нет текстовых блоков</p>
+                <p className="text-sm mt-1">Нажмите &quot;Добавить блок&quot; чтобы создать контент</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {textBlocks.map((block, index) => (
+                  <div key={block.id} className="border border-slate-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-5 h-5 text-slate-300" />
+                        <span className="text-sm font-medium text-slate-500">Блок {index + 1}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveTextBlock(index, 'up')}
+                          disabled={index === 0}
+                          className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveTextBlock(index, 'down')}
+                          disabled={index === textBlocks.length - 1}
+                          className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeTextBlock(block.id)}
+                          className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition ml-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Заголовок блока
+                        </label>
+                        <input
+                          type="text"
+                          value={block.title}
+                          onChange={(e) => updateTextBlock(block.id, { title: e.target.value })}
+                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Например: Как зарегистрироваться"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                          Содержимое
+                        </label>
+                        <RichTextEditor
+                          content={block.content}
+                          onChange={(content) => updateTextBlock(block.id, { content })}
+                          placeholder="Текст блока..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Custom/Dynamic Fields Section */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
@@ -641,7 +1048,7 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleLogoUpload}
+                  onChange={(e) => handleImageUpload(e, 'logo')}
                   className="hidden"
                 />
               </label>

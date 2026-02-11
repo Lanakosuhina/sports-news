@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Save, Globe, Share2, BarChart3, Image as ImageIcon } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Save, Globe, Share2, BarChart3, Image as ImageIcon, Upload } from 'lucide-react'
+import Image from 'next/image'
 
 interface SiteSettings {
   id: string
@@ -20,6 +21,9 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [uploading, setUploading] = useState<string | null>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const faviconInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState<SiteSettings>({
     id: 'default',
     siteName: '',
@@ -36,6 +40,33 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchSettings()
   }, [])
+
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'logo' | 'favicon'
+  ) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(field)
+    const formDataUpload = new FormData()
+    formDataUpload.append('file', file)
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      })
+      const data = await response.json()
+      if (data.url) {
+        setSettings({ ...settings, [field]: data.url })
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+    } finally {
+      setUploading(null)
+    }
+  }
 
   const fetchSettings = async () => {
     try {
@@ -152,35 +183,105 @@ export default function SettingsPage() {
             <ImageIcon className="w-5 h-5 text-blue-500" />
             <h2 className="text-lg font-semibold text-slate-900">Брендинг</h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Logo */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                URL логотипа
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Логотип сайта
               </label>
-              <input
-                type="text"
-                value={settings.logo || ''}
-                onChange={(e) =>
-                  setSettings({ ...settings, logo: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="/logo.svg"
-              />
+              <div className="space-y-3">
+                {settings.logo && (
+                  <div className="relative w-full h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                    <Image
+                      src={settings.logo}
+                      alt="Logo preview"
+                      fill
+                      className="object-contain p-2"
+                      unoptimized
+                    />
+                  </div>
+                )}
+                <div
+                  onClick={() => logoInputRef.current?.click()}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition ${
+                    uploading === 'logo' ? 'bg-blue-50 border-blue-300' : 'border-slate-300'
+                  }`}
+                >
+                  <Upload className={`w-5 h-5 ${uploading === 'logo' ? 'text-blue-500 animate-pulse' : 'text-slate-400'}`} />
+                  <span className="text-sm text-slate-600">
+                    {uploading === 'logo' ? 'Загрузка...' : 'Загрузить логотип'}
+                  </span>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'logo')}
+                    className="hidden"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={settings.logo || ''}
+                  onChange={(e) =>
+                    setSettings({ ...settings, logo: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  placeholder="Или введите URL: /logo.svg"
+                />
+              </div>
             </div>
 
+            {/* Favicon */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                URL favicon
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Favicon
               </label>
-              <input
-                type="text"
-                value={settings.favicon || ''}
-                onChange={(e) =>
-                  setSettings({ ...settings, favicon: e.target.value })
-                }
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="/favicon.ico"
-              />
+              <div className="space-y-3">
+                {settings.favicon && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="relative w-8 h-8 bg-white rounded overflow-hidden border border-slate-200">
+                      <Image
+                        src={settings.favicon}
+                        alt="Favicon preview"
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                    <span className="text-sm text-slate-600 truncate flex-1">{settings.favicon}</span>
+                  </div>
+                )}
+                <div
+                  onClick={() => faviconInputRef.current?.click()}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition ${
+                    uploading === 'favicon' ? 'bg-blue-50 border-blue-300' : 'border-slate-300'
+                  }`}
+                >
+                  <Upload className={`w-5 h-5 ${uploading === 'favicon' ? 'text-blue-500 animate-pulse' : 'text-slate-400'}`} />
+                  <span className="text-sm text-slate-600">
+                    {uploading === 'favicon' ? 'Загрузка...' : 'Загрузить favicon'}
+                  </span>
+                  <input
+                    ref={faviconInputRef}
+                    type="file"
+                    accept="image/*,.ico"
+                    onChange={(e) => handleImageUpload(e, 'favicon')}
+                    className="hidden"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={settings.favicon || ''}
+                  onChange={(e) =>
+                    setSettings({ ...settings, favicon: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  placeholder="Или введите URL: /favicon.ico"
+                />
+                <p className="text-xs text-slate-500">
+                  Рекомендуемый размер: 32×32 или 64×64 пикселей. Форматы: ICO, PNG, SVG
+                </p>
+              </div>
             </div>
           </div>
         </div>

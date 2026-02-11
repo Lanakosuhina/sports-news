@@ -67,7 +67,7 @@ export default function AboutUsCarousel() {
     return () => window.removeEventListener('resize', updateItemsPerView)
   }, [])
 
-  const maxIndex = Math.max(0, aboutItems.length - itemsPerView)
+  const maxIndex = aboutItems.length - 1
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1))
@@ -77,12 +77,17 @@ export default function AboutUsCarousel() {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1))
   }
 
-  const visibleItems = aboutItems.slice(currentIndex, currentIndex + itemsPerView)
-
-  // If we're near the end, wrap around
-  if (visibleItems.length < itemsPerView) {
-    visibleItems.push(...aboutItems.slice(0, itemsPerView - visibleItems.length))
+  // Get visible items - always show itemsPerView items, scrolling by 1
+  const getVisibleItems = () => {
+    const items = []
+    for (let i = 0; i < itemsPerView; i++) {
+      const index = (currentIndex + i) % aboutItems.length
+      items.push(aboutItems[index])
+    }
+    return items
   }
+
+  const visibleItems = getVisibleItems()
 
   return (
     <section className="bg-slate-100 py-12">
@@ -129,14 +134,14 @@ export default function AboutUsCarousel() {
             <ChevronRight className="w-5 h-5 text-slate-600" />
           </button>
 
-          {/* Dots indicator */}
+          {/* Dots indicator - one per starting position */}
           <div className="flex justify-center gap-2 mt-6">
-            {Array.from({ length: Math.ceil(aboutItems.length / itemsPerView) }).map((_, index) => (
+            {aboutItems.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentIndex(index * itemsPerView > maxIndex ? maxIndex : index * itemsPerView)}
+                onClick={() => setCurrentIndex(index)}
                 className={`w-2 h-2 rounded-full transition ${
-                  Math.floor(currentIndex / itemsPerView) === index
+                  currentIndex === index
                     ? 'bg-blue-500'
                     : 'bg-slate-300 hover:bg-slate-400'
                 }`}

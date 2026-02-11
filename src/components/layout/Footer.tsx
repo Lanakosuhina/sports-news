@@ -1,10 +1,10 @@
 import Link from 'next/link'
 
 const mainCategories = [
-  { name: 'Букмекеры', href: '/category/bukmekeryi' },
-  { name: 'Бонусы', href: '/category/bonusyi' },
+  { name: 'Букмекеры', href: '/category/vse-legalnyie-bukmekeryi' },
+  { name: 'Фрибет', href: '/category/fribet' },
   { name: 'Центр ставок', href: '/matches' },
-  { name: 'Новости', href: '/category/novosti' },
+  { name: 'Новости', href: '/news' },
 ]
 
 const quickLinks = [

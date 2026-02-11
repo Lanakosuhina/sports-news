@@ -7,6 +7,11 @@ import Sidebar from '@/components/layout/Sidebar'
 import { Star, ExternalLink, ChevronRight, Check, Smartphone } from 'lucide-react'
 
 // Extended bookmaker type with new fields
+interface TextBlock {
+  title: string
+  content: string
+}
+
 interface BookmakerData {
   id: string
   name: string
@@ -29,6 +34,10 @@ interface BookmakerData {
   isActive: boolean
   order: number
   ratingOrder: number
+  headerBackgroundImage: string | null
+  mobileAppImage: string | null
+  textBlocks: TextBlock[] | null
+  description: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -124,8 +133,19 @@ export default async function BookmakerPage({ params }: BookmakerPageProps) {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Header Card */}
-            <div className="bg-white rounded-xl p-6 md:p-8 mb-6 shadow-sm">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="relative bg-white rounded-xl p-6 md:p-8 mb-6 shadow-sm overflow-hidden">
+              {bookmaker.headerBackgroundImage && (
+                <div className="absolute inset-0">
+                  <Image
+                    src={bookmaker.headerBackgroundImage}
+                    alt=""
+                    fill
+                    className="object-cover opacity-10"
+                    unoptimized
+                  />
+                </div>
+              )}
+              <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
                 {/* Logo */}
                 <div className="w-20 h-20 md:w-24 md:h-24 relative bg-slate-100 rounded-xl overflow-hidden flex-shrink-0">
                   {bookmaker.logo ? (
@@ -159,7 +179,7 @@ export default async function BookmakerPage({ params }: BookmakerPageProps) {
               </div>
 
               {/* Info Row - Site, License, Min Deposit, Apps */}
-              <div className="mt-6 pt-6 border-t border-slate-200">
+              <div className="relative mt-6 pt-6 border-t border-slate-200">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   {/* Website */}
                   <div>
@@ -262,9 +282,21 @@ export default async function BookmakerPage({ params }: BookmakerPageProps) {
                     </div>
                   </div>
                   <div className="hidden md:block flex-shrink-0">
-                    <div className="w-32 h-48 bg-slate-800 rounded-2xl flex items-center justify-center">
-                      <Smartphone className="w-16 h-16 text-slate-600" />
-                    </div>
+                    {bookmaker.mobileAppImage ? (
+                      <div className="w-40 h-52 relative rounded-2xl overflow-hidden">
+                        <Image
+                          src={bookmaker.mobileAppImage}
+                          alt={`${bookmaker.name} мобильное приложение`}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-32 h-48 bg-slate-800 rounded-2xl flex items-center justify-center">
+                        <Smartphone className="w-16 h-16 text-slate-600" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -285,6 +317,25 @@ export default async function BookmakerPage({ params }: BookmakerPageProps) {
                 бонус.
               </p>
             </div>
+
+            {/* Text Blocks */}
+            {bookmaker.textBlocks && bookmaker.textBlocks.length > 0 && (
+              <>
+                {bookmaker.textBlocks.map((block, index) => (
+                  <div key={index} className="bg-white rounded-xl p-6 md:p-8 mb-6 shadow-sm">
+                    {block.title && (
+                      <h2 className="text-xl font-bold text-slate-900 mb-4">{block.title}</h2>
+                    )}
+                    {block.content && (
+                      <div
+                        className="prose prose-slate max-w-none"
+                        dangerouslySetInnerHTML={{ __html: block.content }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
 
             {/* Features */}
             <div className="bg-white rounded-xl p-6 md:p-8 mb-6 shadow-sm">

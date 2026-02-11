@@ -1,29 +1,29 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Edit, Trash2, Save, X, Upload, Eye, EyeOff, BarChart3, Image as ImageIcon } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, X, Upload, Eye, EyeOff, BarChart3, Image as ImageIcon, RefreshCw } from 'lucide-react'
 import Image from 'next/image'
 
 const AD_SIZES = {
-  leaderboard: { width: 728, height: 90, label: '728×90 Leaderboard' },
-  billboard: { width: 970, height: 250, label: '970×250 Billboard' },
-  banner: { width: 468, height: 60, label: '468×60 Banner' },
-  'medium-rectangle': { width: 300, height: 250, label: '300×250 Medium Rectangle' },
-  'large-rectangle': { width: 336, height: 280, label: '336×280 Large Rectangle' },
-  square: { width: 250, height: 250, label: '250×250 Square' },
-  skyscraper: { width: 120, height: 600, label: '120×600 Skyscraper' },
-  'wide-skyscraper': { width: 160, height: 600, label: '160×600 Wide Skyscraper' },
-  'half-page': { width: 300, height: 600, label: '300×600 Half Page' },
+  leaderboard: { width: 728, height: 90, label: '728×90 — Горизонтальный баннер' },
+  billboard: { width: 970, height: 250, label: '970×250 — Билборд' },
+  banner: { width: 468, height: 60, label: '468×60 — Стандартный баннер' },
+  'medium-rectangle': { width: 300, height: 250, label: '300×250 — Средний прямоугольник' },
+  'large-rectangle': { width: 336, height: 280, label: '336×280 — Большой прямоугольник' },
+  square: { width: 250, height: 250, label: '250×250 — Квадрат' },
+  skyscraper: { width: 120, height: 600, label: '120×600 — Небоскрёб' },
+  'wide-skyscraper': { width: 160, height: 600, label: '160×600 — Широкий небоскрёб' },
+  'half-page': { width: 300, height: 600, label: '300×600 — Полстраницы' },
 } as const
 
 const PLACEMENTS = [
   { value: 'header', label: 'Шапка сайта' },
-  { value: 'sidebar-top', label: 'Сайдбар (верх)' },
-  { value: 'sidebar-bottom', label: 'Сайдбар (низ)' },
-  { value: 'article-top', label: 'Статья (верх)' },
-  { value: 'article-bottom', label: 'Статья (низ)' },
+  { value: 'sidebar-top', label: 'Сайдбар — верхний блок' },
+  { value: 'sidebar-bottom', label: 'Сайдбар — нижний блок' },
+  { value: 'article-top', label: 'Статья — над контентом' },
+  { value: 'article-bottom', label: 'Статья — под контентом' },
   { value: 'footer', label: 'Подвал сайта' },
-  { value: 'between-articles', label: 'Между статьями' },
+  { value: 'between-articles', label: 'Лента — между статьями' },
 ]
 
 interface AdZone {
@@ -41,8 +41,20 @@ interface AdZone {
   endDate: string | null
   impressions: number
   clicks: number
+  rotationGroup: string | null
+  rotationInterval: number
   createdAt: string
 }
+
+const ROTATION_GROUPS = [
+  { value: '', label: 'Без ротации' },
+  { value: 'sidebar-top', label: 'Сайдбар — верхний блок' },
+  { value: 'sidebar-bottom', label: 'Сайдбар — нижний блок' },
+  { value: 'article-top', label: 'Статья — над контентом' },
+  { value: 'article-bottom', label: 'Статья — под контентом' },
+  { value: 'header', label: 'Шапка сайта' },
+  { value: 'between-articles', label: 'Лента — между статьями' },
+]
 
 export default function AdsPage() {
   const [ads, setAds] = useState<AdZone[]>([])
@@ -63,6 +75,8 @@ export default function AdsPage() {
     order: 0,
     startDate: '',
     endDate: '',
+    rotationGroup: '',
+    rotationInterval: 5,
   })
 
   useEffect(() => {
@@ -123,6 +137,8 @@ export default function AdsPage() {
           imageUrl: formData.imageUrl || null,
           linkUrl: formData.linkUrl || null,
           code: formData.code || null,
+          rotationGroup: formData.rotationGroup || null,
+          rotationInterval: formData.rotationInterval || 0,
         }),
       })
 
@@ -181,6 +197,8 @@ export default function AdsPage() {
       order: ad.order,
       startDate: ad.startDate ? ad.startDate.split('T')[0] : '',
       endDate: ad.endDate ? ad.endDate.split('T')[0] : '',
+      rotationGroup: ad.rotationGroup || '',
+      rotationInterval: ad.rotationInterval || 5,
     })
     setShowNew(true)
   }
@@ -200,6 +218,8 @@ export default function AdsPage() {
       order: 0,
       startDate: '',
       endDate: '',
+      rotationGroup: '',
+      rotationInterval: 5,
     })
   }
 
@@ -501,6 +521,58 @@ export default function AdsPage() {
               </div>
             </div>
 
+            {/* Rotation Settings */}
+            <div className="border-t border-slate-200 pt-4">
+              <h3 className="font-medium text-slate-900 mb-3">Ротация баннеров</h3>
+              <p className="text-sm text-slate-500 mb-4">
+                Объедините несколько баннеров в группу ротации для автоматической смены
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Группа ротации
+                  </label>
+                  <select
+                    value={formData.rotationGroup}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, rotationGroup: e.target.value }))
+                    }
+                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {ROTATION_GROUPS.map((g) => (
+                      <option key={g.value} value={g.value}>
+                        {g.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Баннеры с одинаковой группой будут чередоваться
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Интервал ротации (сек)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.rotationInterval}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        rotationInterval: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                    className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={!formData.rotationGroup}
+                  />
+                  <p className="text-xs text-slate-400 mt-1">
+                    0 = без автоматической смены, только при перезагрузке
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Active Toggle */}
             <div className="flex items-center gap-3">
               <input
@@ -557,6 +629,9 @@ export default function AdsPage() {
                   Размер
                 </th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">
+                  Ротация
+                </th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">
                   Статус
                 </th>
                 <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">
@@ -601,6 +676,16 @@ export default function AdsPage() {
                     </td>
                     <td className="px-4 py-3 text-slate-600 text-sm">
                       {getSizeLabel(ad.size)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {ad.rotationGroup ? (
+                        <div className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                          <RefreshCw className="w-3 h-3" />
+                          <span>{ad.rotationInterval}с</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
@@ -651,7 +736,7 @@ export default function AdsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
                     Рекламные блоки не найдены
                   </td>
                 </tr>

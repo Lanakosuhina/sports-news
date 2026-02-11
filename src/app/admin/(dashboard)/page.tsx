@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import { FileText, FolderOpen, Tags, Eye, TrendingUp, Plus } from 'lucide-react'
+import { FileText, FolderOpen, Tags, TrendingUp, Plus, Clock } from 'lucide-react'
 import { unstable_cache } from 'next/cache'
 
 // Cached stats function - revalidates every 60 seconds
@@ -12,14 +12,12 @@ const getCachedStats = unstable_cache(
       draftArticles,
       totalCategories,
       totalTags,
-      totalViews,
     ] = await Promise.all([
       prisma.article.count(),
       prisma.article.count({ where: { status: 'PUBLISHED' } }),
       prisma.article.count({ where: { status: 'DRAFT' } }),
       prisma.category.count(),
       prisma.tag.count(),
-      prisma.article.aggregate({ _sum: { views: true } }),
     ])
 
     return {
@@ -28,7 +26,6 @@ const getCachedStats = unstable_cache(
       draftArticles,
       totalCategories,
       totalTags,
-      totalViews: totalViews._sum.views || 0,
     }
   },
   ['admin-dashboard-stats'],
@@ -45,7 +42,6 @@ async function getStats() {
       draftArticles: 0,
       totalCategories: 0,
       totalTags: 0,
-      totalViews: 0,
     }
   }
 }
@@ -65,11 +61,11 @@ async function getRecentArticles() {
   }
 }
 
-async function getPopularArticles() {
+async function getLatestPublished() {
   try {
     return await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: { views: 'desc' },
+      orderBy: { publishedAt: 'desc' },
       take: 5,
       include: {
         category: true,
@@ -81,10 +77,10 @@ async function getPopularArticles() {
 }
 
 export default async function AdminDashboardPage() {
-  const [stats, recentArticles, popularArticles] = await Promise.all([
+  const [stats, recentArticles, latestPublished] = await Promise.all([
     getStats(),
     getRecentArticles(),
-    getPopularArticles(),
+    getLatestPublished(),
   ])
 
   const statCards = [
@@ -118,12 +114,6 @@ export default async function AdminDashboardPage() {
       icon: Tags,
       color: 'bg-pink-500',
     },
-    {
-      label: 'Просмотров',
-      value: stats.totalViews.toLocaleString(),
-      icon: Eye,
-      color: 'bg-blue-500',
-    },
   ]
 
   return (
@@ -141,7 +131,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {statCards.map((stat) => {
           const Icon = stat.icon
           return (
@@ -211,14 +201,14 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Popular Articles */}
+        {/* Latest Published */}
         <div className="bg-white rounded-xl shadow-sm">
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="font-semibold text-slate-900">Популярные статьи</h2>
+            <h2 className="font-semibold text-slate-900">Последние публикации</h2>
           </div>
           <div className="divide-y">
-            {popularArticles.length > 0 ? (
-              popularArticles.map((article, index) => (
+            {latestPublished.length > 0 ? (
+              latestPublished.map((article, index) => (
                 <Link
                   key={article.id}
                   href={`/admin/articles/${article.id}`}
@@ -236,8 +226,8 @@ export default async function AdminDashboardPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-slate-500">
-                    <Eye className="w-4 h-4" />
-                    <span className="text-sm">{article.views.toLocaleString()}</span>
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm">{new Date(article.publishedAt || article.createdAt).toLocaleDateString('ru-RU')}</span>
                   </div>
                 </Link>
               ))

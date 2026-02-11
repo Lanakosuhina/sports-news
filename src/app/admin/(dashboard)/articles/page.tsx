@@ -187,9 +187,6 @@ export default async function AdminArticlesPage({
                   Статус
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">
-                  Просмотры
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">
                   Дата
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-medium text-slate-600">
@@ -227,9 +224,6 @@ export default async function AdminArticlesPage({
                       >
                         {article.status}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {article.views.toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-slate-600 text-sm">
                       {formatDateTime(article.createdAt)}

@@ -52,6 +52,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         order: data.order,
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
+        rotationGroup: data.rotationGroup || null,
+        rotationInterval: data.rotationInterval || 0,
       },
     })
 

@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const placement = searchParams.get('placement')
+    const rotationGroup = searchParams.get('rotationGroup')
     const activeOnly = searchParams.get('active') === 'true'
 
     // Build where clause
@@ -16,6 +17,10 @@ export async function GET(request: NextRequest) {
 
     if (placement) {
       where.placement = placement
+    }
+
+    if (rotationGroup) {
+      where.rotationGroup = rotationGroup
     }
 
     if (activeOnly) {
@@ -73,6 +78,8 @@ export async function POST(request: NextRequest) {
         order: data.order || 0,
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
+        rotationGroup: data.rotationGroup || null,
+        rotationInterval: data.rotationInterval || 0,
       },
     })
 

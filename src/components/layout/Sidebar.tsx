@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { ArticleWithRelations, StandingWithTeam, MatchWithTeams } from '@/types'
 import { formatDate, getImageUrl } from '@/lib/utils'
 import { Calendar, Trophy } from 'lucide-react'
-import { ImageIcon } from 'lucide-react'
+import AdZone from '@/components/ui/AdZone'
 
 interface SidebarProps {
   popularArticles?: ArticleWithRelations[]
@@ -22,12 +22,9 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <aside className="space-y-6">
-      {/* Ad Placeholder - Top */}
+      {/* Ad Zone - Sidebar Top */}
       {showAds && (
-        <div className="bg-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-400 aspect-[300/250]">
-          <ImageIcon className="w-12 h-12 mb-2" />
-          <span className="text-sm">Рекламный блок</span>
-        </div>
+        <AdZone size="medium-rectangle" placement="sidebar-top" />
       )}
 
       {/* Upcoming Matches */}
@@ -167,11 +164,10 @@ export default function Sidebar({
         </div>
       )}
 
-      {/* Ad Placeholder - Bottom */}
+      {/* Ad Zone - Sidebar Bottom */}
       {showAds && (
-        <div className="bg-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-400 aspect-[300/600] sticky top-4">
-          <ImageIcon className="w-12 h-12 mb-2" />
-          <span className="text-sm">Рекламный блок</span>
+        <div className="sticky top-4">
+          <AdZone size="half-page" placement="sidebar-bottom" />
         </div>
       )}
     </aside>

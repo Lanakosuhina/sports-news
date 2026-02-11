@@ -46,6 +46,21 @@ export async function POST(request: Request) {
         order: data.order || 0,
         ratingOrder: data.ratingOrder || 0,
         customFields: data.customFields || null,
+        // Promo fields
+        promoImage: data.promoImage || null,
+        promoTitle: data.promoTitle || null,
+        promoDescription: data.promoDescription || null,
+        promoCode: data.promoCode || null,
+        promoExpiry: data.promoExpiry ? new Date(data.promoExpiry) : null,
+        promoLabel: data.promoLabel || null,
+        showOnFribet: data.showOnFribet ?? false,
+        showOnBezDepozita: data.showOnBezDepozita ?? false,
+        showOnPromokodWinline: data.showOnPromokodWinline ?? false,
+        showOnPromokodyFonbet: data.showOnPromokodyFonbet ?? false,
+        // Page enhancement fields
+        headerBackgroundImage: data.headerBackgroundImage || null,
+        mobileAppImage: data.mobileAppImage || null,
+        textBlocks: data.textBlocks || null,
       },
     })
 

@@ -162,24 +162,27 @@ model Standing {
 }
 
 model AdZone {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  placement   String   @default("sidebar-top") // sidebar-top, sidebar-bottom, article-top, article-bottom, header, footer
-  size        String   @default("medium-rectangle") // medium-rectangle, half-page, leaderboard, etc.
-  imageUrl    String?
-  linkUrl     String?
-  code        String?  // For external ad code (Google Ads, etc.)
-  isActive    Boolean  @default(true)
-  order       Int      @default(0)
-  startDate   DateTime?
-  endDate     DateTime?
-  impressions Int      @default(0)
-  clicks      Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default(cuid())
+  name             String   @unique
+  slug             String   @unique
+  placement        String   @default("sidebar-top") // sidebar-top, sidebar-bottom, article-top, article-bottom, header, footer
+  size             String   @default("medium-rectangle") // medium-rectangle, half-page, leaderboard, etc.
+  imageUrl         String?
+  linkUrl          String?
+  code             String?  // For external ad code (Google Ads, etc.)
+  isActive         Boolean  @default(true)
+  order            Int      @default(0)
+  startDate        DateTime?
+  endDate          DateTime?
+  impressions      Int      @default(0)
+  clicks           Int      @default(0)
+  rotationGroup    String?  // Group name for rotation - ads with same group rotate
+  rotationInterval Int      @default(0) // Rotation interval in seconds (0 = no rotation)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([placement, isActive])
+  @@index([rotationGroup])
 }
 
 model Page {
@@ -265,6 +268,24 @@ model Bookmaker {
   order          Int      @default(0)
   ratingOrder    Int      @default(0)
   customFields   Json?    // Flexible key-value pairs for extensible data
+
+  // Promo card fields for bonus pages
+  promoImage          String?  // Background image for promo card
+  promoTitle          String?  // e.g., "ФРИБЕТЫ ДО 15 000₽"
+  promoDescription    String?  // Description text
+  promoCode           String?  // Promocode to copy
+  promoExpiry         DateTime? // Expiry date (null = бессрочно)
+  promoLabel          String?  // e.g., "Без депозита"
+  showOnFribet        Boolean  @default(false)
+  showOnBezDepozita   Boolean  @default(false)
+  showOnPromokodWinline   Boolean  @default(false)
+  showOnPromokodyFonbet   Boolean  @default(false)
+
+  // Bookmaker page enhancements
+  headerBackgroundImage String?  // Background for header card
+  mobileAppImage        String?  // Banner image in mobile app block
+  textBlocks            Json?    // Array of text blocks [{title, content}]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }

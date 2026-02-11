@@ -7,6 +7,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Pagination from '@/components/ui/Pagination'
 import BookmakersTable from '@/components/bookmakers/BookmakersTable'
 import BookmakersRatingTable from '@/components/bookmakers/BookmakersRatingTable'
+import PromoCard from '@/components/bookmakers/PromoCard'
 import { ArticleWithRelations } from '@/types'
 
 const PAGE_SIZE = 12
@@ -80,7 +81,7 @@ async function getPopularArticles(categoryId: string): Promise<ArticleWithRelati
         categoryId,
         status: 'PUBLISHED',
       },
-      orderBy: { views: 'desc' },
+      orderBy: { publishedAt: 'desc' },
       take: 5,
       include: {
         author: true,
@@ -130,6 +131,69 @@ async function getBookmakersForRating() {
     return await prisma.bookmaker.findMany({
       where: { isActive: true },
       orderBy: { ratingOrder: 'asc' },
+    })
+  } catch {
+    return []
+  }
+}
+
+const promoCardSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  logo: true,
+  bonus: true,
+  link: true,
+  promoImage: true,
+  promoTitle: true,
+  promoDescription: true,
+  promoCode: true,
+  promoExpiry: true,
+  promoLabel: true,
+}
+
+async function getBookmakersForFribet() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showOnFribet: true },
+      orderBy: { order: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getBookmakersForBezDepozita() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showOnBezDepozita: true },
+      orderBy: { order: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getBookmakersForPromokodWinline() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showOnPromokodWinline: true },
+      orderBy: { order: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getBookmakersForPromokodyFonbet() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showOnPromokodyFonbet: true },
+      orderBy: { order: 'asc' },
+      select: promoCardSelect,
     })
   } catch {
     return []
@@ -393,7 +457,10 @@ export default async function CategoryPage({
 
   // Bonus page template - No deposit bonuses
   if (slug === 'bez-depozita') {
-    const tags = await getTags()
+    const [tags, promoBookmakers] = await Promise.all([
+      getTags(),
+      getBookmakersForBezDepozita(),
+    ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
       day: 'numeric',
@@ -410,41 +477,40 @@ export default async function CategoryPage({
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
             <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
             <span>/</span>
-            <Link href="/category/bonusyi" className="hover:text-slate-900 transition">БОНУСЫ</Link>
-            <span>/</span>
             <span className="text-slate-900">БЕЗ ДЕПОЗИТА</span>
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm mb-6">
                 <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
 
                 <h1 className="text-3xl md:text-4xl font-bold mb-6">Бонусы без депозита БК</h1>
 
-                <p className="text-slate-600 leading-relaxed mb-8">
+                <p className="text-slate-600 leading-relaxed">
                   Бездепозитные бонусы — редкая акция, позволяющая игрокам делать ставки без внесения средств на счёт.
                   Чаще всего такие предложения направлены на новых пользователей.
                 </p>
+              </div>
 
-                {/* Bonus Table Header */}
-                <div className="border-b border-slate-200 pb-3 mb-4">
-                  <div className="grid grid-cols-12 gap-4 text-sm text-slate-500">
-                    <div className="col-span-4">Букмекер</div>
-                    <div className="col-span-2">Сумма</div>
-                    <div className="col-span-4">Номинал и условия</div>
-                    <div className="col-span-2"></div>
-                  </div>
+              {/* Promo Cards Grid */}
+              {promoBookmakers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+                  {promoBookmakers.map((bookmaker) => (
+                    <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
+                  ))}
                 </div>
-
-                {/* Empty state / Placeholder */}
-                <div className="py-12 text-center text-slate-400">
-                  <p>Список бонусов без депозита будет добавлен позже</p>
+              ) : (
+                <div className="bg-white rounded-xl p-8 text-center text-slate-400 mb-6">
+                  <p>Промо-предложения будут добавлены позже</p>
+                  <p className="text-sm mt-2">Включите &quot;Без депозита&quot; в настройках букмекера</p>
                 </div>
+              )}
 
-                {/* Footer note */}
-                <p className="text-sm text-slate-500 mt-8 pt-4 border-t border-slate-200">
+              {/* Footer note */}
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <p className="text-sm text-slate-500">
                   *Дополнительные средства выдаются в рамках выполнения цепочки заданий.
                 </p>
               </div>
@@ -462,7 +528,10 @@ export default async function CategoryPage({
 
   // Bonus page template - Freebet
   if (slug === 'fribet') {
-    const tags = await getTags()
+    const [tags, promoBookmakers] = await Promise.all([
+      getTags(),
+      getBookmakersForFribet(),
+    ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
       day: 'numeric',
@@ -479,42 +548,184 @@ export default async function CategoryPage({
           <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
             <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
             <span>/</span>
-            <Link href="/category/bonusyi" className="hover:text-slate-900 transition">БОНУСЫ</Link>
-            <span>/</span>
             <span className="text-slate-900">ФРИБЕТ</span>
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm mb-6">
                 <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
 
                 <h1 className="text-3xl md:text-4xl font-bold mb-6">Фрибеты от букмекеров</h1>
 
-                <p className="text-slate-600 leading-relaxed mb-8">
+                <p className="text-slate-600 leading-relaxed">
                   Фрибет — это бесплатная ставка, которую букмекер дарит игроку в качестве бонуса.
                   Фрибеты позволяют делать ставки без риска потери собственных средств.
                 </p>
+              </div>
 
-                {/* Bonus Table Header */}
-                <div className="border-b border-slate-200 pb-3 mb-4">
-                  <div className="grid grid-cols-12 gap-4 text-sm text-slate-500">
-                    <div className="col-span-4">Букмекер</div>
-                    <div className="col-span-2">Сумма</div>
-                    <div className="col-span-4">Номинал и условия</div>
-                    <div className="col-span-2"></div>
-                  </div>
+              {/* Promo Cards Grid */}
+              {promoBookmakers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+                  {promoBookmakers.map((bookmaker) => (
+                    <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
+                  ))}
                 </div>
-
-                {/* Empty state / Placeholder */}
-                <div className="py-12 text-center text-slate-400">
-                  <p>Список фрибетов будет добавлен позже</p>
+              ) : (
+                <div className="bg-white rounded-xl p-8 text-center text-slate-400 mb-6">
+                  <p>Промо-предложения будут добавлены позже</p>
+                  <p className="text-sm mt-2">Включите &quot;Показывать на странице фрибетов&quot; в настройках букмекера</p>
                 </div>
+              )}
 
-                {/* Footer note */}
-                <p className="text-sm text-slate-500 mt-8 pt-4 border-t border-slate-200">
+              {/* Footer note */}
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <p className="text-sm text-slate-500">
                   *Условия получения фрибета могут отличаться у разных букмекеров.
+                  Перед активацией бонуса ознакомьтесь с правилами на сайте букмекера.
+                </p>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Sidebar popularArticles={[]} tags={tags} />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Promokod Winline page
+  if (slug === 'promokod-winline') {
+    const [tags, promoBookmakers] = await Promise.all([
+      getTags(),
+      getBookmakersForPromokodWinline(),
+    ])
+    const now = new Date()
+    const updateDate = now.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    return (
+      <div className="bg-slate-50 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+            <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
+            <span>/</span>
+            <span className="text-slate-900">ПРОМОКОД WINLINE</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm mb-6">
+                <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
+
+                <h1 className="text-3xl md:text-4xl font-bold mb-6">Промокоды Winline</h1>
+
+                <p className="text-slate-600 leading-relaxed">
+                  Актуальные промокоды Winline для получения бонусов при регистрации и пополнении счёта.
+                  Используйте промокод для увеличения приветственного бонуса.
+                </p>
+              </div>
+
+              {/* Promo Cards Grid */}
+              {promoBookmakers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+                  {promoBookmakers.map((bookmaker) => (
+                    <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl p-8 text-center text-slate-400 mb-6">
+                  <p>Промо-предложения будут добавлены позже</p>
+                  <p className="text-sm mt-2">Включите &quot;Промокод Winline&quot; в настройках букмекера</p>
+                </div>
+              )}
+
+              {/* Footer note */}
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <p className="text-sm text-slate-500">
+                  *Промокоды имеют ограниченный срок действия. Актуальность уточняйте на сайте букмекера.
+                </p>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Sidebar popularArticles={[]} tags={tags} />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Promokody Fonbet page
+  if (slug === 'promokodyi-fonbet') {
+    const [tags, promoBookmakers] = await Promise.all([
+      getTags(),
+      getBookmakersForPromokodyFonbet(),
+    ])
+    const now = new Date()
+    const updateDate = now.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    return (
+      <div className="bg-slate-50 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+            <Link href="/" className="hover:text-slate-900 transition">ГЛАВНАЯ</Link>
+            <span>/</span>
+            <span className="text-slate-900">ПРОМОКОДЫ FONBET</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm mb-6">
+                <p className="text-slate-500 text-sm mb-4">Обновлено: {updateDate}</p>
+
+                <h1 className="text-3xl md:text-4xl font-bold mb-6">Промокоды Fonbet</h1>
+
+                <p className="text-slate-600 leading-relaxed">
+                  Актуальные промокоды Fonbet для получения бонусов при регистрации и пополнении счёта.
+                  Используйте промокод для увеличения приветственного бонуса.
+                </p>
+              </div>
+
+              {/* Promo Cards Grid */}
+              {promoBookmakers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+                  {promoBookmakers.map((bookmaker) => (
+                    <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl p-8 text-center text-slate-400 mb-6">
+                  <p>Промо-предложения будут добавлены позже</p>
+                  <p className="text-sm mt-2">Включите &quot;Промокоды Fonbet&quot; в настройках букмекера</p>
+                </div>
+              )}
+
+              {/* Footer note */}
+              <div className="bg-white rounded-xl p-6 shadow-sm">
+                <p className="text-sm text-slate-500">
+                  *Промокоды имеют ограниченный срок действия. Актуальность уточняйте на сайте букмекера.
                 </p>
               </div>
             </div>

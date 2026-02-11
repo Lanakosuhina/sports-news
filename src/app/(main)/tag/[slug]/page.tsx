@@ -62,7 +62,7 @@ async function getPopularArticles(): Promise<ArticleWithRelations[]> {
   try {
     return await prisma.article.findMany({
       where: { status: 'PUBLISHED' },
-      orderBy: { views: 'desc' },
+      orderBy: { publishedAt: 'desc' },
       take: 5,
       include: {
         author: true,
