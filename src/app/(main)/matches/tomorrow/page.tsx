@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
 import { CalendarDays, ChevronLeft, Trophy } from 'lucide-react'
-import { getTodayMatches, SportDBMatch } from '@/lib/sportdb'
+import { getTomorrowMatches, groupMatchesByLeague, TheSportsDBMatch } from '@/lib/thesportsdb'
 
 export const metadata: Metadata = {
   title: 'Матчи завтра | Центр ставок — Тренды спорта',
@@ -33,35 +33,16 @@ async function getTags() {
   }
 }
 
-// Group matches by league
-function groupMatchesByLeague(matches: SportDBMatch[]): Record<string, SportDBMatch[]> {
-  const grouped: Record<string, SportDBMatch[]> = {}
-  matches.forEach((match) => {
-    const leagueName = match.league.country
-      ? `${match.league.country}: ${match.league.name}`
-      : match.league.name
-    if (!grouped[leagueName]) {
-      grouped[leagueName] = []
-    }
-    grouped[leagueName].push(match)
-  })
-  return grouped
-}
 
 export default async function TomorrowMatchesPage() {
-  // Use today's API matches and filter scheduled ones
-  // Note: The API provides live/today matches; for tomorrow we show scheduled matches
   const [apiMatches, tags] = await Promise.all([
-    getTodayMatches(),
+    getTomorrowMatches(),
     getTags(),
   ])
 
-  // Get scheduled matches (upcoming)
-  const scheduledMatches = apiMatches.filter((m: SportDBMatch) => m.status === 'scheduled')
-
   // Separate football and hockey matches
-  const footballMatches = scheduledMatches.filter((m: SportDBMatch) => m.sport === 'football')
-  const hockeyMatches = scheduledMatches.filter((m: SportDBMatch) => m.sport === 'hockey')
+  const footballMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'football')
+  const hockeyMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'hockey')
 
   // Group by league
   const footballByLeague = groupMatchesByLeague(footballMatches)
@@ -159,7 +140,7 @@ export default async function TomorrowMatchesPage() {
             )}
 
             {/* Empty state */}
-            {scheduledMatches.length === 0 && (
+            {apiMatches.length === 0 && (
               <div className="bg-white rounded-xl p-8 text-center">
                 <CalendarDays className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">

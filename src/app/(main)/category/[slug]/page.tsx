@@ -399,7 +399,7 @@ export default async function CategoryPage({
                             <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
                               <span>✓ Лицензия</span>
                             </div>
-                            {bookmaker.androidAppLink ? (
+                            {bookmaker.androidAppLink && bookmaker.androidAppLink.trim() ? (
                               <a
                                 href={bookmaker.androidAppLink}
                                 target="_blank"
@@ -432,7 +432,7 @@ export default async function CategoryPage({
                             <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
                               <span>✓ Лицензия</span>
                             </div>
-                            {bookmaker.iosAppLink ? (
+                            {bookmaker.iosAppLink && bookmaker.iosAppLink.trim() ? (
                               <a
                                 href={bookmaker.iosAppLink}
                                 target="_blank"

@@ -5,7 +5,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
 import { StandingWithTeam } from '@/types'
 import { Calendar, CalendarDays, Trophy } from 'lucide-react'
-import { getTodayMatches, SportDBMatch } from '@/lib/sportdb'
+import { getAllUpcomingMatches, groupMatchesByLeague, TheSportsDBMatch } from '@/lib/thesportsdb'
 
 export const metadata: Metadata = {
   title: 'Центр ставок — Матчи | Тренды спорта',
@@ -72,32 +72,18 @@ async function getStandings(): Promise<StandingWithTeam[]> {
   }
 }
 
-// Group matches by league
-function groupMatchesByLeague(matches: SportDBMatch[]): Record<string, SportDBMatch[]> {
-  const grouped: Record<string, SportDBMatch[]> = {}
-  matches.forEach((match) => {
-    const leagueName = match.league.country
-      ? `${match.league.country}: ${match.league.name}`
-      : match.league.name
-    if (!grouped[leagueName]) {
-      grouped[leagueName] = []
-    }
-    grouped[leagueName].push(match)
-  })
-  return grouped
-}
 
 export default async function MatchesPage() {
   const [apiMatches, categories, tags, standings] = await Promise.all([
-    getTodayMatches(),
+    getAllUpcomingMatches(),
     getCategories(),
     getTags(),
     getStandings(),
   ])
 
   // Separate football and hockey matches
-  const footballMatches = apiMatches.filter((m: SportDBMatch) => m.sport === 'football')
-  const hockeyMatches = apiMatches.filter((m: SportDBMatch) => m.sport === 'hockey')
+  const footballMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'football')
+  const hockeyMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'hockey')
 
   // Group by league
   const footballByLeague = groupMatchesByLeague(footballMatches)
