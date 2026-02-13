@@ -5,15 +5,12 @@ import { Plus, Edit, Trash2, Save, X, Upload, Eye, EyeOff, BarChart3, Image as I
 import Image from 'next/image'
 
 const AD_SIZES = {
+  'header-banner': { width: 1120, height: 120, label: '1120×120 — Шапка сайта' },
   leaderboard: { width: 728, height: 90, label: '728×90 — Горизонтальный баннер' },
-  billboard: { width: 970, height: 250, label: '970×250 — Билборд' },
-  banner: { width: 468, height: 60, label: '468×60 — Стандартный баннер' },
-  'medium-rectangle': { width: 300, height: 250, label: '300×250 — Средний прямоугольник' },
-  'large-rectangle': { width: 336, height: 280, label: '336×280 — Большой прямоугольник' },
-  square: { width: 250, height: 250, label: '250×250 — Квадрат' },
-  skyscraper: { width: 120, height: 600, label: '120×600 — Небоскрёб' },
-  'wide-skyscraper': { width: 160, height: 600, label: '160×600 — Широкий небоскрёб' },
+  square: { width: 300, height: 300, label: '300×300 — Квадрат' },
   'half-page': { width: 300, height: 600, label: '300×600 — Полстраницы' },
+  'vertical-medium': { width: 240, height: 400, label: '240×400 — Вертикальный баннер' },
+  fullscreen: { width: 1920, height: 1080, label: 'Fullscreen — Полноэкранный баннер' },
 } as const
 
 const PLACEMENTS = [
@@ -67,7 +64,7 @@ export default function AdsPage() {
     name: '',
     slug: '',
     placement: 'sidebar-top',
-    size: 'medium-rectangle',
+    size: 'square',
     imageUrl: '',
     linkUrl: '',
     code: '',
@@ -210,7 +207,7 @@ export default function AdsPage() {
       name: '',
       slug: '',
       placement: 'sidebar-top',
-      size: 'medium-rectangle',
+      size: 'square',
       imageUrl: '',
       linkUrl: '',
       code: '',
@@ -409,6 +406,17 @@ export default function AdsPage() {
                           className="object-contain"
                           unoptimized
                         />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                          }}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                          title="Удалить изображение"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                       <div className="flex items-center justify-center gap-2 text-green-600">
                         <ImageIcon className="w-5 h-5" />

@@ -45,6 +45,14 @@ export async function POST(request: Request) {
         isActive: data.isActive ?? true,
         order: data.order || 0,
         ratingOrder: data.ratingOrder || 0,
+        // Page-specific order fields
+        orderOnFribet: data.orderOnFribet ?? 0,
+        orderOnBezDepozita: data.orderOnBezDepozita ?? 0,
+        orderOnPromokodWinline: data.orderOnPromokodWinline ?? 0,
+        orderOnPromokodyFonbet: data.orderOnPromokodyFonbet ?? 0,
+        orderOnBonusPage: data.orderOnBonusPage ?? 0,
+        orderOnAppsPage: data.orderOnAppsPage ?? 0,
+        orderOnLegalPage: data.orderOnLegalPage ?? 0,
         customFields: data.customFields || null,
         // Promo fields
         promoImage: data.promoImage || null,
@@ -53,10 +61,16 @@ export async function POST(request: Request) {
         promoCode: data.promoCode || null,
         promoExpiry: data.promoExpiry ? new Date(data.promoExpiry) : null,
         promoLabel: data.promoLabel || null,
+        bonusConditions: data.bonusConditions || null,
         showOnFribet: data.showOnFribet ?? false,
         showOnBezDepozita: data.showOnBezDepozita ?? false,
         showOnPromokodWinline: data.showOnPromokodWinline ?? false,
         showOnPromokodyFonbet: data.showOnPromokodyFonbet ?? false,
+        // PromoCard visibility
+        showPromoCardOnFribet: data.showPromoCardOnFribet ?? false,
+        showPromoCardOnBezDepozita: data.showPromoCardOnBezDepozita ?? false,
+        showPromoCardOnPromokodWinline: data.showPromoCardOnPromokodWinline ?? false,
+        showPromoCardOnPromokodyFonbet: data.showPromoCardOnPromokodyFonbet ?? false,
         // Page enhancement fields
         headerBackgroundImage: data.headerBackgroundImage || null,
         mobileAppImage: data.mobileAppImage || null,

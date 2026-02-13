@@ -267,6 +267,16 @@ model Bookmaker {
   isActive       Boolean  @default(true)
   order          Int      @default(0)
   ratingOrder    Int      @default(0)
+
+  // Order for specific pages
+  orderOnFribet            Int      @default(0)
+  orderOnBezDepozita       Int      @default(0)
+  orderOnPromokodWinline   Int      @default(0)
+  orderOnPromokodyFonbet   Int      @default(0)
+  orderOnBonusPage         Int      @default(0)  // bukmekeryi-s-bonusami
+  orderOnAppsPage          Int      @default(0)  // prilozheniya-bukmekerov
+  orderOnLegalPage         Int      @default(0)  // vse-legalnyie-bukmekeryi
+
   customFields   Json?    // Flexible key-value pairs for extensible data
 
   // Promo card fields for bonus pages
@@ -276,10 +286,19 @@ model Bookmaker {
   promoCode           String?  // Promocode to copy
   promoExpiry         DateTime? // Expiry date (null = бессрочно)
   promoLabel          String?  // e.g., "Без депозита"
+  bonusConditions     String?  // Conditions text for bonus table
+
+  // Show in BonusTable (table at top)
   showOnFribet        Boolean  @default(false)
   showOnBezDepozita   Boolean  @default(false)
   showOnPromokodWinline   Boolean  @default(false)
   showOnPromokodyFonbet   Boolean  @default(false)
+
+  // Show PromoCard (cards below table)
+  showPromoCardOnFribet        Boolean  @default(false)
+  showPromoCardOnBezDepozita   Boolean  @default(false)
+  showPromoCardOnPromokodWinline   Boolean  @default(false)
+  showPromoCardOnPromokodyFonbet   Boolean  @default(false)
 
   // Bookmaker page enhancements
   headerBackgroundImage String?  // Background for header card

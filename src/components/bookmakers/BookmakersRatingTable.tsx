@@ -82,21 +82,45 @@ export default function BookmakersRatingTable({ bookmakers, title = 'Честн�
         {bookmakers.map((bookmaker, index) => (
           <div
             key={bookmaker.id}
-            className="flex items-center justify-between p-4 hover:bg-slate-50 transition"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 hover:bg-slate-50 transition gap-3"
           >
             {/* Logo & Name */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1">
               <BookmakerLogo bookmaker={bookmaker} rank={index + 1} />
               <span className="font-semibold text-slate-900 text-base">{bookmaker.name}</span>
             </div>
 
-            {/* Details Button */}
-            <Link
-              href={`/bookmaker/${bookmaker.slug}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap"
-            >
-              Подробнее
-            </Link>
+            {/* Bonus Amount */}
+            {bookmaker.bonus && (
+              <div className="flex items-center">
+                <div className="text-center px-3 py-1.5 bg-slate-50 rounded-lg">
+                  <div className="text-base font-bold text-slate-900">{bookmaker.bonus}</div>
+                  <div className="text-[10px] text-slate-500">Бонус</div>
+                </div>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-2">
+              {/* Забрать button - links to external bookmaker site */}
+              {bookmaker.bonus && (
+                <a
+                  href={bookmaker.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap text-center"
+                >
+                  Забрать
+                </a>
+              )}
+              {/* Details Button */}
+              <Link
+                href={`/bookmaker/${bookmaker.slug}`}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap"
+              >
+                Подробнее
+              </Link>
+            </div>
           </div>
         ))}
       </div>

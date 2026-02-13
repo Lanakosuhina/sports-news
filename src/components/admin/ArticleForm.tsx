@@ -464,6 +464,7 @@ export default function ArticleForm({
                   src={getImageUrl(formData.featuredImage)}
                   alt="Featured"
                   fill
+                  sizes="(max-width: 768px) 100vw, 400px"
                   className="object-cover"
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
@@ -502,13 +503,13 @@ export default function ArticleForm({
               Или введите URL:
             </p>
             <input
-              type="url"
+              type="text"
               value={formData.featuredImage}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, featuredImage: e.target.value }))
               }
               className="w-full mt-2 px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              placeholder="https://..."
+              placeholder="/uploads/... или https://..."
             />
           </div>
 
@@ -526,6 +527,7 @@ export default function ArticleForm({
                       src={getImageUrl(image)}
                       alt={`Gallery ${index + 1}`}
                       fill
+                      sizes="100px"
                       className="object-cover"
                     />
                     <div className="absolute top-1 right-1 flex gap-1">

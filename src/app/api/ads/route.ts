@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         name: data.name,
         slug,
         placement: data.placement || 'sidebar-top',
-        size: data.size || 'medium-rectangle',
+        size: data.size || 'square',
         imageUrl: data.imageUrl || null,
         linkUrl: data.linkUrl || null,
         code: data.code || null,

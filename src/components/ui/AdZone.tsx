@@ -3,20 +3,18 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 
-// Стандартные размеры рекламных блоков (IAB)
+// Размеры рекламных блоков
 const AD_SIZES = {
   // Горизонтальные
+  'header-banner': { width: 1120, height: 120, label: '1120×120' },
   leaderboard: { width: 728, height: 90, label: '728×90' },
-  billboard: { width: 970, height: 250, label: '970×250' },
-  banner: { width: 468, height: 60, label: '468×60' },
-  // Прямоугольные
-  'medium-rectangle': { width: 300, height: 250, label: '300×250' },
-  'large-rectangle': { width: 336, height: 280, label: '336×280' },
-  square: { width: 250, height: 250, label: '250×250' },
+  // Квадратный
+  square: { width: 300, height: 300, label: '300×300' },
   // Вертикальные
-  skyscraper: { width: 120, height: 600, label: '120×600' },
-  'wide-skyscraper': { width: 160, height: 600, label: '160×600' },
   'half-page': { width: 300, height: 600, label: '300×600' },
+  'vertical-medium': { width: 240, height: 400, label: '240×400' },
+  // Полноэкранный
+  fullscreen: { width: 1920, height: 1080, label: 'Fullscreen' },
 } as const
 
 type AdSize = keyof typeof AD_SIZES
@@ -42,7 +40,7 @@ interface AdZoneProps {
 }
 
 export default function AdZone({
-  size = 'medium-rectangle',
+  size = 'square',
   imageSrc,
   link,
   className = '',
@@ -149,7 +147,7 @@ export default function AdZone({
   const displayLink = adData?.linkUrl || link
   const displayCode = adData?.code
 
-  const { width, height, label } = AD_SIZES[displaySize] || AD_SIZES['medium-rectangle']
+  const { width, height, label } = AD_SIZES[displaySize] || AD_SIZES['square']
 
   // If still loading, show placeholder
   if (loading) {

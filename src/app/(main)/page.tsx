@@ -117,7 +117,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Content - Bookmakers Table */}
             <div className="lg:col-span-2">
-              <BookmakersTable bookmakers={bookmakers} />
+              <BookmakersTable bookmakers={bookmakers} showBonus={true} />
             </div>
 
             {/* Right Sidebar - Selections + Popular */}

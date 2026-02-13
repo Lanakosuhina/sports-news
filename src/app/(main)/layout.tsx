@@ -2,6 +2,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CookieConsent from '@/components/ui/CookieConsent'
 import StickyAdBanner from '@/components/ui/StickyAdBanner'
+import FullscreenBanner from '@/components/ui/FullscreenBanner'
 
 export default async function MainLayout({
   children,
@@ -15,6 +16,7 @@ export default async function MainLayout({
       <Footer />
       <CookieConsent />
       <StickyAdBanner />
+      <FullscreenBanner />
     </div>
   )
 }

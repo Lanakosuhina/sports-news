@@ -9,6 +9,12 @@ import { formatDate, getImageUrl } from '@/lib/utils'
 import { ArticleWithRelations } from '@/types'
 import { Calendar, User, Tag } from 'lucide-react'
 import { timeAgo } from '@/lib/utils'
+import {
+  generateArticleSchema,
+  generateBreadcrumbSchema,
+  JsonLd,
+  SITE_URL,
+} from '@/lib/structured-data'
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
@@ -116,6 +122,8 @@ export async function generateMetadata({
   const description = article.metaDescription || article.excerpt
   const imageUrl = getImageUrl(article.featuredImage)
 
+  const articleUrl = `${SITE_URL}/article/${slug}`
+
   return {
     title,
     description,
@@ -123,6 +131,9 @@ export async function generateMetadata({
       title,
       description,
       type: 'article',
+      url: articleUrl,
+      siteName: 'Тренды спорта',
+      locale: 'ru_RU',
       publishedTime: article.publishedAt?.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       authors: article.author ? [article.author.name] : undefined,
@@ -143,9 +154,9 @@ export async function generateMetadata({
       description,
       images: article.featuredImage ? [imageUrl] : undefined,
     },
-    alternates: article.canonicalUrl
-      ? { canonical: article.canonicalUrl }
-      : undefined,
+    alternates: {
+      canonical: article.canonicalUrl || articleUrl,
+    },
   }
 }
 
@@ -163,13 +174,41 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     getTags(),
   ])
 
+  // Generate structured data
+  const breadcrumbItems = [
+    { name: 'Главная', url: '/' },
+    { name: article.category.name, url: `/category/${article.category.slug}` },
+  ]
+  if (article.league) {
+    breadcrumbItems.push({
+      name: article.league.name,
+      url: `/category/${article.category.slug}?league=${article.league.slug}`,
+    })
+  }
+  breadcrumbItems.push({ name: article.title, url: `/article/${article.slug}` })
+
+  const articleSchema = generateArticleSchema({
+    title: article.title,
+    description: article.excerpt || article.metaDescription || '',
+    slug: article.slug,
+    featuredImage: article.featuredImage,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    author: article.author,
+    category: article.category,
+  })
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems)
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <article className="lg:col-span-2">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+    <>
+      <JsonLd data={[articleSchema, breadcrumbSchema]} />
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <article className="lg:col-span-2">
+            {/* Breadcrumb */}
+            <nav className="flex items-center gap-2 text-sm text-slate-500 mb-4">
             <Link href="/" className="hover:text-blue-500">
               Главная
             </Link>
@@ -395,11 +434,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
         </article>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Sidebar popularArticles={popularArticles} tags={tags} />
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Sidebar popularArticles={popularArticles} tags={tags} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

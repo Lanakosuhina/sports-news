@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Save, Globe, Share2, BarChart3, Image as ImageIcon, Upload } from 'lucide-react'
+import { Save, Globe, Share2, BarChart3, Image as ImageIcon, Upload, X } from 'lucide-react'
 import Image from 'next/image'
 
 interface SiteSettings {
@@ -191,7 +191,7 @@ export default function SettingsPage() {
               </label>
               <div className="space-y-3">
                 {settings.logo && (
-                  <div className="relative w-full h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                  <div className="relative w-full h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 group">
                     <Image
                       src={settings.logo}
                       alt="Logo preview"
@@ -199,6 +199,14 @@ export default function SettingsPage() {
                       className="object-contain p-2"
                       unoptimized
                     />
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, logo: '' })}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                      title="Удалить"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
                 <div
@@ -238,7 +246,7 @@ export default function SettingsPage() {
               </label>
               <div className="space-y-3">
                 {settings.favicon && (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 group">
                     <div className="relative w-8 h-8 bg-white rounded overflow-hidden border border-slate-200">
                       <Image
                         src={settings.favicon}
@@ -249,6 +257,14 @@ export default function SettingsPage() {
                       />
                     </div>
                     <span className="text-sm text-slate-600 truncate flex-1">{settings.favicon}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, favicon: '' })}
+                      className="p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                      title="Удалить"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 )}
                 <div

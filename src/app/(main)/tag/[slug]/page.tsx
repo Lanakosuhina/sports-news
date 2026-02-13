@@ -6,6 +6,11 @@ import Sidebar from '@/components/layout/Sidebar'
 import Pagination from '@/components/ui/Pagination'
 import { ArticleWithRelations } from '@/types'
 import { Tag } from 'lucide-react'
+import {
+  generateBreadcrumbSchema,
+  JsonLd,
+  SITE_URL,
+} from '@/lib/structured-data'
 
 const PAGE_SIZE = 12
 
@@ -106,12 +111,21 @@ export async function generateMetadata({
     return { title: 'Тег не найден' }
   }
 
+  const tagUrl = `${SITE_URL}/tag/${slug}`
+
   return {
     title: `#${tag.name}`,
     description: `Все статьи с тегом #${tag.name} на Тренды спорта`,
     openGraph: {
       title: `#${tag.name} | Тренды спорта`,
       description: `Все статьи с тегом #${tag.name} на Тренды спорта`,
+      url: tagUrl,
+      siteName: 'Тренды спорта',
+      locale: 'ru_RU',
+      type: 'website',
+    },
+    alternates: {
+      canonical: tagUrl,
     },
   }
 }
@@ -135,14 +149,22 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
+  // Generate structured data
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Главная', url: '/' },
+    { name: `#${tag.name}`, url: `/tag/${tag.slug}` },
+  ])
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Tag Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Tag className="w-8 h-8 text-blue-500" />
-          <h1 className="text-3xl font-bold">#{tag.name}</h1>
-        </div>
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <div className="container mx-auto px-4 py-8">
+        {/* Tag Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Tag className="w-8 h-8 text-blue-500" />
+            <h1 className="text-3xl font-bold">#{tag.name}</h1>
+          </div>
         <p className="text-slate-600">
           {total} {total === 1 ? 'статья' : total < 5 ? 'статьи' : 'статей'} с тегом #{tag.name}
         </p>
@@ -172,11 +194,12 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Sidebar popularArticles={popularArticles} tags={tags} />
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Sidebar popularArticles={popularArticles} tags={tags} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

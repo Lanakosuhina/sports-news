@@ -20,6 +20,7 @@ interface BookmakersTableProps {
   title?: string
   buttonText?: string
   linkToPage?: boolean
+  showBonus?: boolean
 }
 
 function BookmakerLogo({ bookmaker }: { bookmaker: Bookmaker }) {
@@ -53,7 +54,8 @@ export default function BookmakersTable({
   bookmakers,
   title = 'Легальные букмекерские конторы',
   buttonText = 'Перейти',
-  linkToPage = true
+  linkToPage = true,
+  showBonus = false
 }: BookmakersTableProps) {
   if (bookmakers.length === 0) return null
 
@@ -68,23 +70,52 @@ export default function BookmakersTable({
         {bookmakers.map((bookmaker) => (
           <div
             key={bookmaker.id}
-            className="flex items-center justify-between p-4 hover:bg-slate-50 transition"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 hover:bg-slate-50 transition gap-3"
           >
             {/* Logo & Name */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1">
               <BookmakerLogo bookmaker={bookmaker} />
-              <span className="font-semibold text-slate-900 text-base">{bookmaker.name}</span>
+              <div className="flex flex-col">
+                <span className="font-semibold text-slate-900 text-base">{bookmaker.name}</span>
+                {showBonus && bookmaker.bonusLabel && (
+                  <span className="text-xs text-slate-500">{bookmaker.bonusLabel}</span>
+                )}
+              </div>
             </div>
 
-            {/* Play/Go Button */}
-            <Link
-              href={linkToPage ? `/bookmaker/${bookmaker.slug}` : bookmaker.link}
-              target={linkToPage ? undefined : "_blank"}
-              rel={linkToPage ? undefined : "noopener noreferrer"}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap"
-            >
-              {buttonText}
-            </Link>
+            {/* Bonus Amount */}
+            {showBonus && bookmaker.bonus && (
+              <div className="flex items-center">
+                <div className="text-center px-3 py-1.5 bg-slate-50 rounded-lg">
+                  <div className="text-base font-bold text-slate-900">{bookmaker.bonus}</div>
+                  <div className="text-[10px] text-slate-500">Бонус</div>
+                </div>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-2">
+              {/* Забрать button - links to external bookmaker site */}
+              {showBonus && bookmaker.bonus && (
+                <a
+                  href={bookmaker.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-400 hover:bg-blue-500 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap text-center"
+                >
+                  Забрать
+                </a>
+              )}
+              {/* Перейти button - links to internal page */}
+              <Link
+                href={linkToPage ? `/bookmaker/${bookmaker.slug}` : bookmaker.link}
+                target={linkToPage ? undefined : "_blank"}
+                rel={linkToPage ? undefined : "noopener noreferrer"}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm whitespace-nowrap text-center"
+              >
+                {buttonText}
+              </Link>
+            </div>
           </div>
         ))}
       </div>

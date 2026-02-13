@@ -24,7 +24,7 @@ export default function Sidebar({
     <aside className="space-y-6">
       {/* Ad Zone - Sidebar Top */}
       {showAds && (
-        <AdZone size="medium-rectangle" placement="sidebar-top" />
+        <AdZone size="square" placement="sidebar-top" />
       )}
 
       {/* Upcoming Matches */}

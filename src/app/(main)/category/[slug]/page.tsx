@@ -8,7 +8,14 @@ import Pagination from '@/components/ui/Pagination'
 import BookmakersTable from '@/components/bookmakers/BookmakersTable'
 import BookmakersRatingTable from '@/components/bookmakers/BookmakersRatingTable'
 import PromoCard from '@/components/bookmakers/PromoCard'
+import BonusTable from '@/components/bookmakers/BonusTable'
 import { ArticleWithRelations } from '@/types'
+import {
+  generateCategorySchema,
+  generateBreadcrumbSchema,
+  JsonLd,
+  SITE_URL,
+} from '@/lib/structured-data'
 
 const PAGE_SIZE = 12
 
@@ -115,22 +122,44 @@ async function getTags() {
   }
 }
 
-async function getBookmakers() {
+async function getBookmakersForRating() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true },
-      orderBy: { order: 'asc' },
+      orderBy: { ratingOrder: 'asc' },
     })
   } catch {
     return []
   }
 }
 
-async function getBookmakersForRating() {
+async function getBookmakersForBonusPage() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true },
-      orderBy: { ratingOrder: 'asc' },
+      orderBy: { orderOnBonusPage: 'asc' },
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getBookmakersForAppsPage() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true },
+      orderBy: { orderOnAppsPage: 'asc' },
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getBookmakersForLegalPage() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true },
+      orderBy: { orderOnLegalPage: 'asc' },
     })
   } catch {
     return []
@@ -150,13 +179,15 @@ const promoCardSelect = {
   promoCode: true,
   promoExpiry: true,
   promoLabel: true,
+  bonusConditions: true,
 }
 
-async function getBookmakersForFribet() {
+// BonusTable queries (for table at top)
+async function getBookmakersForFribetTable() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true, showOnFribet: true },
-      orderBy: { order: 'asc' },
+      orderBy: { orderOnFribet: 'asc' },
       select: promoCardSelect,
     })
   } catch {
@@ -164,11 +195,11 @@ async function getBookmakersForFribet() {
   }
 }
 
-async function getBookmakersForBezDepozita() {
+async function getBookmakersForBezDepozitaTable() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true, showOnBezDepozita: true },
-      orderBy: { order: 'asc' },
+      orderBy: { orderOnBezDepozita: 'asc' },
       select: promoCardSelect,
     })
   } catch {
@@ -176,11 +207,11 @@ async function getBookmakersForBezDepozita() {
   }
 }
 
-async function getBookmakersForPromokodWinline() {
+async function getBookmakersForPromokodWinlineTable() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true, showOnPromokodWinline: true },
-      orderBy: { order: 'asc' },
+      orderBy: { orderOnPromokodWinline: 'asc' },
       select: promoCardSelect,
     })
   } catch {
@@ -188,11 +219,60 @@ async function getBookmakersForPromokodWinline() {
   }
 }
 
-async function getBookmakersForPromokodyFonbet() {
+async function getBookmakersForPromokodyFonbetTable() {
   try {
     return await prisma.bookmaker.findMany({
       where: { isActive: true, showOnPromokodyFonbet: true },
-      orderBy: { order: 'asc' },
+      orderBy: { orderOnPromokodyFonbet: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+// PromoCard queries (for cards below table)
+async function getPromoCardsForFribet() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showPromoCardOnFribet: true },
+      orderBy: { orderOnFribet: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getPromoCardsForBezDepozita() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showPromoCardOnBezDepozita: true },
+      orderBy: { orderOnBezDepozita: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getPromoCardsForPromokodWinline() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showPromoCardOnPromokodWinline: true },
+      orderBy: { orderOnPromokodWinline: 'asc' },
+      select: promoCardSelect,
+    })
+  } catch {
+    return []
+  }
+}
+
+async function getPromoCardsForPromokodyFonbet() {
+  try {
+    return await prisma.bookmaker.findMany({
+      where: { isActive: true, showPromoCardOnPromokodyFonbet: true },
+      orderBy: { orderOnPromokodyFonbet: 'asc' },
       select: promoCardSelect,
     })
   } catch {
@@ -210,12 +290,21 @@ export async function generateMetadata({
     return { title: 'Категория не найдена' }
   }
 
+  const categoryUrl = `${SITE_URL}/category/${slug}`
+
   return {
     title: `${category.name} — Новости`,
     description: category.description || `Последние новости ${category.name}, обновления и аналитика`,
     openGraph: {
       title: `${category.name} — Новости | Тренды спорта`,
       description: category.description || `Последние новости ${category.name}, обновления и аналитика`,
+      url: categoryUrl,
+      siteName: 'Тренды спорта',
+      locale: 'ru_RU',
+      type: 'website',
+    },
+    alternates: {
+      canonical: categoryUrl,
     },
   }
 }
@@ -229,7 +318,7 @@ export default async function CategoryPage({
 
   // Special page for bookmaker apps
   if (slug === 'prilozheniya-bukmekerov') {
-    const bookmakers = await getBookmakers()
+    const bookmakers = await getBookmakersForAppsPage()
     const tags = await getTags()
 
     // Show all bookmakers with apps
@@ -301,40 +390,77 @@ export default async function CategoryPage({
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Android */}
-                        <div className="border border-slate-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="font-semibold text-slate-900">{bookmaker.name} на Android</span>
-                            <span className="text-xs bg-slate-100 px-2 py-1 rounded">18+</span>
+                        {bookmaker.hasAndroidApp && (
+                          <div className="border border-slate-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-semibold text-slate-900">{bookmaker.name} на Android</span>
+                              <span className="text-xs bg-slate-100 px-2 py-1 rounded">18+</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
+                              <span>✓ Лицензия</span>
+                            </div>
+                            {bookmaker.androidAppLink ? (
+                              <a
+                                href={bookmaker.androidAppLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M17.523 15.341a.5.5 0 0 0-.5-.5h-.25v-1.5a3 3 0 0 0-3-3h-3.5a3 3 0 0 0-3 3v1.5h-.25a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-4.5zM7.773 8.341a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm6.5 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm-6.5 4a.5.5 0 0 1 .5-.5h.25a.5.5 0 0 1 .5.5v1.5h4.5v-1.5a.5.5 0 0 1 .5-.5h.25a.5.5 0 0 1 .5.5v1.5h1v-1.5a2 2 0 0 0-2-2h-3.5a2 2 0 0 0-2 2v1.5h1v-1.5z"/>
+                                </svg>
+                                Скачать для Android
+                              </a>
+                            ) : (
+                              <Link
+                                href={`/bookmaker/${bookmaker.slug}`}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
+                              >
+                                Подробнее
+                              </Link>
+                            )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
-                            <span>✓ Лицензия</span>
-                            <span>№1 Рейтинг</span>
-                          </div>
-                          <Link
-                            href={`/bookmaker/${bookmaker.slug}`}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
-                          >
-                            Скачать приложение
-                          </Link>
-                        </div>
+                        )}
 
                         {/* iOS */}
-                        <div className="border border-slate-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="font-semibold text-slate-900">{bookmaker.name} на iOS</span>
-                            <span className="text-xs bg-slate-100 px-2 py-1 rounded">18+</span>
+                        {bookmaker.hasIosApp && (
+                          <div className="border border-slate-200 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-semibold text-slate-900">{bookmaker.name} на iOS</span>
+                              <span className="text-xs bg-slate-100 px-2 py-1 rounded">18+</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
+                              <span>✓ Лицензия</span>
+                            </div>
+                            {bookmaker.iosAppLink ? (
+                              <a
+                                href={bookmaker.iosAppLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
+                              >
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/>
+                                </svg>
+                                Скачать для iOS
+                              </a>
+                            ) : (
+                              <Link
+                                href={`/bookmaker/${bookmaker.slug}`}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
+                              >
+                                Подробнее
+                              </Link>
+                            )}
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
-                            <span>✓ Лицензия</span>
-                            <span>№1 Рейтинг</span>
+                        )}
+
+                        {/* Show message if no apps */}
+                        {!bookmaker.hasAndroidApp && !bookmaker.hasIosApp && (
+                          <div className="col-span-2 text-center text-slate-500 py-4">
+                            Приложение недоступно
                           </div>
-                          <Link
-                            href={`/bookmaker/${bookmaker.slug}`}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
-                          >
-                          Скачать приложение
-                          </Link>
-                        </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -354,7 +480,7 @@ export default async function CategoryPage({
 
   // Special page for bookmakers with bonuses
   if (slug === 'bukmekeryi-s-bonusami') {
-    const bookmakers = await getBookmakers()
+    const bookmakers = await getBookmakersForBonusPage()
     const tags = await getTags()
 
     return (
@@ -383,6 +509,7 @@ export default async function CategoryPage({
                 title="Букмекеры с бонусами"
                 buttonText="Перейти"
                 linkToPage={true}
+                showBonus={true}
               />
             </div>
 
@@ -398,7 +525,7 @@ export default async function CategoryPage({
 
   // Special page for legal bookmakers
   if (slug === 'vse-legalnyie-bukmekeryi') {
-    const bookmakers = await getBookmakers()
+    const bookmakers = await getBookmakersForLegalPage()
     const tags = await getTags()
 
     return (
@@ -442,7 +569,7 @@ export default async function CategoryPage({
                 Легальные букмекеры в России
               </h2>
 
-              <BookmakersTable bookmakers={bookmakers} title="" />
+              <BookmakersTable bookmakers={bookmakers} title="" showBonus={true} />
             </div>
 
             {/* Sidebar */}
@@ -457,9 +584,10 @@ export default async function CategoryPage({
 
   // Bonus page template - No deposit bonuses
   if (slug === 'bez-depozita') {
-    const [tags, promoBookmakers] = await Promise.all([
+    const [tags, tableBookmakers, promoCardBookmakers] = await Promise.all([
       getTags(),
-      getBookmakersForBezDepozita(),
+      getBookmakersForBezDepozitaTable(),
+      getPromoCardsForBezDepozita(),
     ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
@@ -494,10 +622,20 @@ export default async function CategoryPage({
                 </p>
               </div>
 
+              {/* Bonus Table */}
+              {tableBookmakers.length > 0 && (
+                <div className="mb-8">
+                  <BonusTable
+                    bookmakers={tableBookmakers}
+                    title="Бонусы без депозита БК"
+                  />
+                </div>
+              )}
+
               {/* Promo Cards Grid */}
-              {promoBookmakers.length > 0 ? (
+              {promoCardBookmakers.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                  {promoBookmakers.map((bookmaker) => (
+                  {promoCardBookmakers.map((bookmaker) => (
                     <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
                   ))}
                 </div>
@@ -528,9 +666,10 @@ export default async function CategoryPage({
 
   // Bonus page template - Freebet
   if (slug === 'fribet') {
-    const [tags, promoBookmakers] = await Promise.all([
+    const [tags, tableBookmakers, promoCardBookmakers] = await Promise.all([
       getTags(),
-      getBookmakersForFribet(),
+      getBookmakersForFribetTable(),
+      getPromoCardsForFribet(),
     ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
@@ -565,10 +704,20 @@ export default async function CategoryPage({
                 </p>
               </div>
 
+              {/* Bonus Table */}
+              {tableBookmakers.length > 0 && (
+                <div className="mb-8">
+                  <BonusTable
+                    bookmakers={tableBookmakers}
+                    title="Фрибеты от букмекеров"
+                  />
+                </div>
+              )}
+
               {/* Promo Cards Grid */}
-              {promoBookmakers.length > 0 ? (
+              {promoCardBookmakers.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                  {promoBookmakers.map((bookmaker) => (
+                  {promoCardBookmakers.map((bookmaker) => (
                     <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
                   ))}
                 </div>
@@ -600,9 +749,10 @@ export default async function CategoryPage({
 
   // Promokod Winline page
   if (slug === 'promokod-winline') {
-    const [tags, promoBookmakers] = await Promise.all([
+    const [tags, tableBookmakers, promoCardBookmakers] = await Promise.all([
       getTags(),
-      getBookmakersForPromokodWinline(),
+      getBookmakersForPromokodWinlineTable(),
+      getPromoCardsForPromokodWinline(),
     ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
@@ -637,10 +787,20 @@ export default async function CategoryPage({
                 </p>
               </div>
 
+              {/* Bonus Table */}
+              {tableBookmakers.length > 0 && (
+                <div className="mb-8">
+                  <BonusTable
+                    bookmakers={tableBookmakers}
+                    title="Промокоды Winline"
+                  />
+                </div>
+              )}
+
               {/* Promo Cards Grid */}
-              {promoBookmakers.length > 0 ? (
+              {promoCardBookmakers.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                  {promoBookmakers.map((bookmaker) => (
+                  {promoCardBookmakers.map((bookmaker) => (
                     <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
                   ))}
                 </div>
@@ -671,9 +831,10 @@ export default async function CategoryPage({
 
   // Promokody Fonbet page
   if (slug === 'promokodyi-fonbet') {
-    const [tags, promoBookmakers] = await Promise.all([
+    const [tags, tableBookmakers, promoCardBookmakers] = await Promise.all([
       getTags(),
-      getBookmakersForPromokodyFonbet(),
+      getBookmakersForPromokodyFonbetTable(),
+      getPromoCardsForPromokodyFonbet(),
     ])
     const now = new Date()
     const updateDate = now.toLocaleDateString('ru-RU', {
@@ -708,10 +869,20 @@ export default async function CategoryPage({
                 </p>
               </div>
 
+              {/* Bonus Table */}
+              {tableBookmakers.length > 0 && (
+                <div className="mb-8">
+                  <BonusTable
+                    bookmakers={tableBookmakers}
+                    title="Промокоды Fonbet"
+                  />
+                </div>
+              )}
+
               {/* Promo Cards Grid */}
-              {promoBookmakers.length > 0 ? (
+              {promoCardBookmakers.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-                  {promoBookmakers.map((bookmaker) => (
+                  {promoCardBookmakers.map((bookmaker) => (
                     <PromoCard key={bookmaker.id} bookmaker={bookmaker} />
                   ))}
                 </div>
@@ -817,11 +988,25 @@ export default async function CategoryPage({
     ? `/category/${slug}?league=${leagueSlug}`
     : `/category/${slug}`
 
+  // Generate structured data
+  const categorySchema = generateCategorySchema({
+    name: category.name,
+    slug: category.slug,
+    description: category.description,
+  })
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Главная', url: '/' },
+    { name: category.name, url: `/category/${category.slug}` },
+  ])
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Category Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold mb-2">{category.name}</h1>
+    <>
+      <JsonLd data={[categorySchema, breadcrumbSchema]} />
+      <div className="container mx-auto px-4 py-8">
+        {/* Category Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">{category.name}</h1>
         {category.description && (
           <p className="text-slate-600">{category.description}</p>
         )}
@@ -880,11 +1065,12 @@ export default async function CategoryPage({
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Sidebar popularArticles={popularArticles} tags={tags} />
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Sidebar popularArticles={popularArticles} tags={tags} />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

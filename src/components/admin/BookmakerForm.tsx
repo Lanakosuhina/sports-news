@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Save, ArrowLeft, Upload, Plus, Trash2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react'
+import { Save, ArrowLeft, Upload, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { useToast } from '@/components/ui/Toast'
 
 const RichTextEditor = dynamic(() => import('./RichTextEditor'), { ssr: false })
 
@@ -44,6 +45,13 @@ interface BookmakerFormProps {
     isActive: boolean
     order: number
     ratingOrder: number
+    orderOnFribet: number
+    orderOnBezDepozita: number
+    orderOnPromokodWinline: number
+    orderOnPromokodyFonbet: number
+    orderOnBonusPage: number
+    orderOnAppsPage: number
+    orderOnLegalPage: number
     customFields: Record<string, unknown> | null
     // Promo fields
     promoImage: string | null
@@ -52,10 +60,16 @@ interface BookmakerFormProps {
     promoCode: string | null
     promoExpiry: Date | null
     promoLabel: string | null
+    bonusConditions: string | null
     showOnFribet: boolean
     showOnBezDepozita: boolean
     showOnPromokodWinline: boolean
     showOnPromokodyFonbet: boolean
+    // PromoCard visibility
+    showPromoCardOnFribet: boolean
+    showPromoCardOnBezDepozita: boolean
+    showPromoCardOnPromokodWinline: boolean
+    showPromoCardOnPromokodyFonbet: boolean
     // Page enhancement fields
     headerBackgroundImage: string | null
     mobileAppImage: string | null
@@ -80,6 +94,7 @@ const PREDEFINED_CUSTOM_FIELDS = [
 
 export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: bookmaker?.name || '',
@@ -99,8 +114,15 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
     iosAppLink: bookmaker?.iosAppLink || '',
     androidAppLink: bookmaker?.androidAppLink || '',
     isActive: bookmaker?.isActive ?? true,
-    order: bookmaker?.order || 0,
-    ratingOrder: bookmaker?.ratingOrder || 0,
+    order: bookmaker?.order ?? 100,
+    ratingOrder: bookmaker?.ratingOrder ?? 100,
+    orderOnFribet: bookmaker?.orderOnFribet ?? 100,
+    orderOnBezDepozita: bookmaker?.orderOnBezDepozita ?? 100,
+    orderOnPromokodWinline: bookmaker?.orderOnPromokodWinline ?? 100,
+    orderOnPromokodyFonbet: bookmaker?.orderOnPromokodyFonbet ?? 100,
+    orderOnBonusPage: bookmaker?.orderOnBonusPage ?? 100,
+    orderOnAppsPage: bookmaker?.orderOnAppsPage ?? 100,
+    orderOnLegalPage: bookmaker?.orderOnLegalPage ?? 100,
     // Promo fields
     promoImage: bookmaker?.promoImage || '',
     promoTitle: bookmaker?.promoTitle || '',
@@ -108,10 +130,16 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
     promoCode: bookmaker?.promoCode || '',
     promoExpiry: bookmaker?.promoExpiry ? new Date(bookmaker.promoExpiry).toISOString().split('T')[0] : '',
     promoLabel: bookmaker?.promoLabel || '',
+    bonusConditions: bookmaker?.bonusConditions || '',
     showOnFribet: bookmaker?.showOnFribet ?? false,
     showOnBezDepozita: bookmaker?.showOnBezDepozita ?? false,
     showOnPromokodWinline: bookmaker?.showOnPromokodWinline ?? false,
     showOnPromokodyFonbet: bookmaker?.showOnPromokodyFonbet ?? false,
+    // PromoCard visibility
+    showPromoCardOnFribet: bookmaker?.showPromoCardOnFribet ?? false,
+    showPromoCardOnBezDepozita: bookmaker?.showPromoCardOnBezDepozita ?? false,
+    showPromoCardOnPromokodWinline: bookmaker?.showPromoCardOnPromokodWinline ?? false,
+    showPromoCardOnPromokodyFonbet: bookmaker?.showPromoCardOnPromokodyFonbet ?? false,
     // Page enhancement fields
     headerBackgroundImage: bookmaker?.headerBackgroundImage || '',
     mobileAppImage: bookmaker?.mobileAppImage || '',
@@ -230,9 +258,13 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
       const data = await response.json()
       if (data.url) {
         setFormData({ ...formData, [field]: data.url })
+        showToast('Изображение успешно загружено', 'success')
+      } else {
+        showToast('Ошибка загрузки изображения', 'error')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
+      showToast('Ошибка загрузки изображения', 'error')
     }
   }
 
@@ -292,6 +324,14 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
           rating: parseFloat(formData.rating.toString()) || 0,
           order: parseInt(formData.order.toString()) || 0,
           ratingOrder: parseInt(formData.ratingOrder.toString()) || 0,
+          // Page-specific order fields
+          orderOnFribet: parseInt(formData.orderOnFribet.toString()) || 0,
+          orderOnBezDepozita: parseInt(formData.orderOnBezDepozita.toString()) || 0,
+          orderOnPromokodWinline: parseInt(formData.orderOnPromokodWinline.toString()) || 0,
+          orderOnPromokodyFonbet: parseInt(formData.orderOnPromokodyFonbet.toString()) || 0,
+          orderOnBonusPage: parseInt(formData.orderOnBonusPage.toString()) || 0,
+          orderOnAppsPage: parseInt(formData.orderOnAppsPage.toString()) || 0,
+          orderOnLegalPage: parseInt(formData.orderOnLegalPage.toString()) || 0,
           customFields: Object.keys(customFieldsObject).length > 0 ? customFieldsObject : null,
           promoExpiry: formData.promoExpiry ? new Date(formData.promoExpiry).toISOString() : null,
           textBlocks: textBlocks.length > 0
@@ -301,18 +341,23 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
       })
 
       if (response.ok) {
-        router.push('/admin/bookmakers')
-        router.refresh()
+        showToast(bookmaker ? 'Букмекер успешно обновлён' : 'Букмекер успешно создан', 'success')
+        setLoading(false)
+        // Delay redirect to show toast
+        setTimeout(() => {
+          router.push('/admin/bookmakers')
+          router.refresh()
+        }, 1500)
+        return
       } else {
         const error = await response.json()
-        alert(error.error || 'Ошибка сохранения')
+        showToast(error.error || 'Ошибка сохранения', 'error')
       }
     } catch (error) {
       console.error('Error saving bookmaker:', error)
-      alert('Ошибка сохранения')
-    } finally {
-      setLoading(false)
+      showToast('Ошибка сохранения', 'error')
     }
+    setLoading(false)
   }
 
   const renderCustomFieldInput = (field: CustomField) => {
@@ -594,51 +639,150 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
             </div>
           </div>
 
-          {/* Promo Card Section */}
+          {/* Bonus Table Section - For BonusTable component */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">Промо-карточка (Фрибет)</h2>
-              <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded">Для страницы фрибетов</span>
+              <h2 className="text-lg font-semibold text-slate-900">Таблица бонусов</h2>
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded">Таблица на странице</span>
             </div>
+            <p className="text-sm text-slate-500 mb-4">
+              Эти данные отображаются в таблице бонусов на страницах: Фрибет, Без депозита, Промокоды
+            </p>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.showOnFribet}
-                    onChange={(e) => setFormData({ ...formData, showOnFribet: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-                  />
-                  <span className="text-slate-700">Фрибет</span>
+              {/* Show on pages checkboxes */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Показывать на страницах
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.showOnBezDepozita}
-                    onChange={(e) => setFormData({ ...formData, showOnBezDepozita: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-                  />
-                  <span className="text-slate-700">Без депозита</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.showOnPromokodWinline}
-                    onChange={(e) => setFormData({ ...formData, showOnPromokodWinline: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-                  />
-                  <span className="text-slate-700">Промокод Winline</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.showOnPromokodyFonbet}
-                    onChange={(e) => setFormData({ ...formData, showOnPromokodyFonbet: e.target.checked })}
-                    className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-                  />
-                  <span className="text-slate-700">Промокоды Fonbet</span>
-                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border rounded-lg hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnFribet}
+                      onChange={(e) => setFormData({ ...formData, showOnFribet: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                    />
+                    <span className="text-slate-700">Фрибет</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border rounded-lg hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnBezDepozita}
+                      onChange={(e) => setFormData({ ...formData, showOnBezDepozita: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                    />
+                    <span className="text-slate-700">Без депозита</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border rounded-lg hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnPromokodWinline}
+                      onChange={(e) => setFormData({ ...formData, showOnPromokodWinline: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                    />
+                    <span className="text-slate-700">Промокод Winline</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border rounded-lg hover:bg-slate-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showOnPromokodyFonbet}
+                      onChange={(e) => setFormData({ ...formData, showOnPromokodyFonbet: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+                    />
+                    <span className="text-slate-700">Промокоды Fonbet</span>
+                  </label>
+                </div>
               </div>
+
+              <div className="border-t pt-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Промокод
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.promoCode}
+                    onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    placeholder="LEGAL15"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Код который пользователь может скопировать</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Номинал и условия
+                </label>
+                <textarea
+                  value={formData.bonusConditions}
+                  onChange={(e) => setFormData({ ...formData, bonusConditions: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="100 — 15 000 рублей. Используйте код «LEGAL15» при создании..."
+                />
+                <p className="text-xs text-slate-400 mt-1">Текст для колонки &quot;Номинал и условия&quot; в таблице</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Promo Card Section - For PromoCard component */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-lg font-semibold text-slate-900">Промо-карточка</h2>
+              <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded">Карточка под таблицей</span>
+            </div>
+            <p className="text-sm text-slate-500 mb-4">
+              Эти данные отображаются в промо-карточках под таблицей бонусов
+            </p>
+            <div className="space-y-4">
+              {/* Show PromoCard on pages checkboxes */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Показывать промо-карточку на страницах
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border border-orange-200 rounded-lg hover:bg-orange-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showPromoCardOnFribet}
+                      onChange={(e) => setFormData({ ...formData, showPromoCardOnFribet: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-slate-700">Фрибет</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border border-orange-200 rounded-lg hover:bg-orange-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showPromoCardOnBezDepozita}
+                      onChange={(e) => setFormData({ ...formData, showPromoCardOnBezDepozita: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-slate-700">Без депозита</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border border-orange-200 rounded-lg hover:bg-orange-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showPromoCardOnPromokodWinline}
+                      onChange={(e) => setFormData({ ...formData, showPromoCardOnPromokodWinline: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-slate-700">Промокод Winline</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2 border border-orange-200 rounded-lg hover:bg-orange-50">
+                    <input
+                      type="checkbox"
+                      checked={formData.showPromoCardOnPromokodyFonbet}
+                      onChange={(e) => setFormData({ ...formData, showPromoCardOnPromokodyFonbet: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-slate-700">Промокоды Fonbet</span>
+                  </label>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">Если ничего не выбрано - карточка не будет показана</p>
+              </div>
+
+              <div className="border-t pt-4"></div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -680,46 +824,40 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Промокод
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.promoCode}
-                    onChange={(e) => setFormData({ ...formData, promoCode: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                    placeholder="LEGAL15"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Срок действия
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.promoExpiry}
-                    onChange={(e) => setFormData({ ...formData, promoExpiry: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <p className="text-xs text-slate-400 mt-1">Оставьте пустым для &quot;бессрочно&quot;</p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Срок действия
+                </label>
+                <input
+                  type="date"
+                  value={formData.promoExpiry}
+                  onChange={(e) => setFormData({ ...formData, promoExpiry: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <p className="text-xs text-slate-400 mt-1">Оставьте пустым для &quot;бессрочно&quot;</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Фоновое изображение промо-карточки
+                  Фоновое изображение карточки
                 </label>
                 <div className="space-y-2">
                   {formData.promoImage && (
-                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden group">
                       <Image
                         src={formData.promoImage}
                         alt="Promo preview"
                         fill
                         className="object-cover"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, promoImage: '' })}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                        title="Удалить"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   )}
                   <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
@@ -757,13 +895,21 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
                 </label>
                 <div className="space-y-2">
                   {formData.headerBackgroundImage && (
-                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden group">
                       <Image
                         src={formData.headerBackgroundImage}
                         alt="Header preview"
                         fill
                         className="object-cover"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, headerBackgroundImage: '' })}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                        title="Удалить"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   )}
                   <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
@@ -793,13 +939,21 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
                 </label>
                 <div className="space-y-2">
                   {formData.mobileAppImage && (
-                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                    <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden group">
                       <Image
                         src={formData.mobileAppImage}
                         alt="Mobile app preview"
                         fill
                         className="object-cover"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, mobileAppImage: '' })}
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                        title="Удалить"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   )}
                   <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
@@ -1033,13 +1187,21 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
             <h3 className="font-semibold text-slate-900 mb-4">Логотип</h3>
             <div className="space-y-4">
               {formData.logo && (
-                <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden">
+                <div className="relative w-full h-32 bg-slate-100 rounded-lg overflow-hidden group">
                   <Image
                     src={formData.logo}
                     alt="Logo preview"
                     fill
                     className="object-contain"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, logo: '' })}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-600 transition"
+                    title="Удалить"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               )}
               <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-slate-50 transition">
@@ -1109,27 +1271,118 @@ export default function BookmakerForm({ bookmaker }: BookmakerFormProps) {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h3 className="font-semibold text-slate-900 mb-4">Сортировка</h3>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Порядок в списке
-                </label>
-                <input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Общий порядок
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.order}
+                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                    Честный рейтинг
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.ratingOrder}
+                    onChange={(e) => setFormData({ ...formData, ratingOrder: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Порядок в рейтинге
-                </label>
-                <input
-                  type="number"
-                  value={formData.ratingOrder}
-                  onChange={(e) => setFormData({ ...formData, ratingOrder: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+
+              <div className="border-t pt-3">
+                <p className="text-xs text-slate-500 mb-2">Порядок на бонусных страницах:</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Фрибеты
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnFribet}
+                      onChange={(e) => setFormData({ ...formData, orderOnFribet: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Без депозита
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnBezDepozita}
+                      onChange={(e) => setFormData({ ...formData, orderOnBezDepozita: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Промокод Winline
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnPromokodWinline}
+                      onChange={(e) => setFormData({ ...formData, orderOnPromokodWinline: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Промокоды Fonbet
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnPromokodyFonbet}
+                      onChange={(e) => setFormData({ ...formData, orderOnPromokodyFonbet: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-3">
+                <p className="text-xs text-slate-500 mb-2">Порядок на страницах категорий:</p>
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      С бонусами
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnBonusPage}
+                      onChange={(e) => setFormData({ ...formData, orderOnBonusPage: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Приложения
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnAppsPage}
+                      onChange={(e) => setFormData({ ...formData, orderOnAppsPage: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      Легальные БК
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.orderOnLegalPage}
+                      onChange={(e) => setFormData({ ...formData, orderOnLegalPage: parseInt(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

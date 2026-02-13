@@ -13,12 +13,13 @@ interface PromoCardProps {
     logo: string | null
     bonus: string | null
     link: string
-    promoImage: string | null
-    promoTitle: string | null
-    promoDescription: string | null
-    promoCode: string | null
-    promoExpiry: Date | null
-    promoLabel: string | null
+    promoImage?: string | null
+    promoTitle?: string | null
+    promoDescription?: string | null
+    promoCode?: string | null
+    promoExpiry?: Date | null
+    promoLabel?: string | null
+    bonusConditions?: string | null
   }
 }
 
@@ -33,7 +34,7 @@ export default function PromoCard({ bookmaker }: PromoCardProps) {
     }
   }
 
-  const formatExpiry = (date: Date | null) => {
+  const formatExpiry = (date: Date | null | undefined) => {
     if (!date) return 'бессрочно'
     const now = new Date()
     const expiry = new Date(date)

@@ -141,7 +141,54 @@ src/
 - **Пользователи** — управление администраторами
 - **Настройки** — настройки сайта
 
-## Деплой на сервер
+## Деплой на Vercel (рекомендуется)
+
+**ВАЖНО:** GitHub Pages НЕ подходит для этого проекта! Next.js с базой данных требует серверного хостинга.
+
+### 1. Настройка базы данных
+
+Создайте PostgreSQL базу данных на одном из сервисов:
+- [Neon](https://neon.tech) — бесплатно, рекомендуется
+- [Supabase](https://supabase.com) — бесплатно
+- [Railway](https://railway.app) — бесплатно (ограниченно)
+
+### 2. Деплой на Vercel
+
+1. Зайдите на [vercel.com](https://vercel.com) и войдите через GitHub
+2. Нажмите "Add New" → "Project"
+3. Выберите репозиторий `sports-news`
+4. В настройках добавьте переменные окружения:
+   - `DATABASE_URL` — строка подключения к PostgreSQL
+   - `NEXTAUTH_SECRET` — сгенерируйте: `openssl rand -base64 32`
+   - `NEXTAUTH_URL` — URL вашего сайта на Vercel (например `https://sports-news.vercel.app`)
+5. Нажмите "Deploy"
+
+### 3. Инициализация базы данных
+
+После первого деплоя выполните в терминале:
+
+```bash
+# Клонируйте репозиторий локально
+git clone https://github.com/Lanakosuhina/sports-news.git
+cd sports-news
+npm install
+
+# Настройте .env с вашим DATABASE_URL от Neon/Supabase
+cp .env.example .env
+# Отредактируйте .env
+
+# Создайте таблицы и заполните данными
+npm run db:push
+npm run db:seed
+```
+
+### 4. Автоматический деплой
+
+После настройки каждый `git push` в main будет автоматически деплоиться на Vercel.
+
+---
+
+## Деплой на VPS (альтернатива)
 
 ### 1. Подготовка сервера
 

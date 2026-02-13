@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import SessionProvider from '@/components/providers/SessionProvider'
 import AdminLayout from '@/components/admin/AdminLayout'
+import { ToastProvider } from '@/components/ui/Toast'
 
 export default async function AdminDashboardLayout({
   children,
@@ -17,7 +18,9 @@ export default async function AdminDashboardLayout({
 
   return (
     <SessionProvider>
-      <AdminLayout>{children}</AdminLayout>
+      <ToastProvider>
+        <AdminLayout>{children}</AdminLayout>
+      </ToastProvider>
     </SessionProvider>
   )
 }
