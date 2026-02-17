@@ -23,14 +23,14 @@ const sportConfig: Record<string, { name: string; apiSport: string }> = {
 const leagueConfig: Record<string, { name: string; keywords: string[] }> = {
   // Football leagues
   'liga-chempionov': { name: 'Лига чемпионов', keywords: ['Champions League', 'UEFA Champions'] },
-  'apl': { name: 'АПЛ', keywords: ['Premier League', 'England: Premier'] },
-  'la-liga': { name: 'Ла Лига', keywords: ['La Liga', 'Spain: La Liga'] },
-  'seriya-a': { name: 'Серия А', keywords: ['Serie A', 'Italy: Serie A'] },
-  'bundesliga': { name: 'Бундеслига', keywords: ['Bundesliga', 'Germany: Bundesliga'] },
-  'liga-1': { name: 'Лига 1', keywords: ['Ligue 1', 'France: Ligue 1'] },
+  'apl': { name: 'АПЛ', keywords: ['Premier League'] },
+  'la-liga': { name: 'Ла Лига', keywords: ['LaLiga', 'La Liga'] },
+  'seriya-a': { name: 'Серия А', keywords: ['Serie A'] },
+  'bundesliga': { name: 'Бундеслига', keywords: ['Bundesliga'] },
+  'liga-1': { name: 'Лига 1', keywords: ['Ligue 1'] },
   // Hockey leagues
-  'khl': { name: 'КХЛ', keywords: ['KHL', 'Russia: KHL'] },
-  'nhl': { name: 'НХЛ', keywords: ['NHL', 'USA: NHL'] },
+  'khl': { name: 'КХЛ', keywords: ['KHL'] },
+  'nhl': { name: 'НХЛ', keywords: ['NHL'] },
   // Tennis tournaments - Grand Slams
   'australian-open': { name: 'Australian Open', keywords: ['Australian Open'] },
   'roland-garros': { name: 'Roland Garros', keywords: ['Roland Garros', 'French Open'] },

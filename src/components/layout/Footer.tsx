@@ -94,7 +94,7 @@ export default function Footer() {
             </p>
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
               <p>Главный редактор — Олег Георгиевич Багдасаров</p>
-              <p>Телефон главного редактора: </p>
+              <p>Телефон главного редактора: +7 (989) 112-68-33 </p>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
               <p>&copy; {new Date().getFullYear()} Тренды спорта. Все права защищены.</p>

@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
-import { CalendarDays, ChevronLeft, Trophy } from 'lucide-react'
-import { getTomorrowMatches, groupMatchesByLeague, TheSportsDBMatch } from '@/lib/thesportsdb'
+import { CalendarDays, ChevronLeft } from 'lucide-react'
+import { getTomorrowMatches, groupMatchesByLeague, SportDBMatch, AVAILABLE_SPORTS } from '@/lib/sportdb'
 
 export const metadata: Metadata = {
   title: 'Матчи завтра | Центр ставок — Тренды спорта',
@@ -40,13 +40,15 @@ export default async function TomorrowMatchesPage() {
     getTags(),
   ])
 
-  // Separate football and hockey matches
-  const footballMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'football')
-  const hockeyMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'hockey')
-
-  // Group by league
-  const footballByLeague = groupMatchesByLeague(footballMatches)
-  const hockeyByLeague = groupMatchesByLeague(hockeyMatches)
+  // Group matches by sport, then by league
+  const matchesBySport = AVAILABLE_SPORTS.map(sport => {
+    const sportMatches = apiMatches.filter((m: SportDBMatch) => m.sport === sport.slug)
+    return {
+      ...sport,
+      matches: sportMatches,
+      byLeague: groupMatchesByLeague(sportMatches),
+    }
+  }).filter(sport => sport.matches.length > 0)
 
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
@@ -103,15 +105,15 @@ export default async function TomorrowMatchesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Football Matches */}
-            {Object.keys(footballByLeague).length > 0 && (
-              <div className="mb-8">
+            {/* All Sports Matches */}
+            {matchesBySport.map(sport => (
+              <div key={sport.slug} className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-6 h-6 text-amber-500" />
-                  <h3 className="text-xl font-bold">Футбол</h3>
-                  <span className="text-slate-500">({footballMatches.length})</span>
+                  <span className="text-2xl">{sport.icon}</span>
+                  <h3 className="text-xl font-bold">{sport.name}</h3>
+                  <span className="text-slate-500">({sport.matches.length})</span>
                 </div>
-                {Object.entries(footballByLeague).map(([league, matches]) => (
+                {Object.entries(sport.byLeague).map(([league, matches]) => (
                   <MatchesSection
                     key={league}
                     title={league}
@@ -119,25 +121,7 @@ export default async function TomorrowMatchesPage() {
                   />
                 ))}
               </div>
-            )}
-
-            {/* Hockey Matches */}
-            {Object.keys(hockeyByLeague).length > 0 && (
-              <div className="mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-6 h-6 text-amber-500" />
-                  <h3 className="text-xl font-bold">Хоккей</h3>
-                  <span className="text-slate-500">({hockeyMatches.length})</span>
-                </div>
-                {Object.entries(hockeyByLeague).map(([league, matches]) => (
-                  <MatchesSection
-                    key={league}
-                    title={league}
-                    matches={matches}
-                  />
-                ))}
-              </div>
-            )}
+            ))}
 
             {/* Empty state */}
             {apiMatches.length === 0 && (

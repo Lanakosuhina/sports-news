@@ -4,8 +4,8 @@ import { prisma } from '@/lib/prisma'
 import Sidebar from '@/components/layout/Sidebar'
 import MatchesSection from '@/components/news/MatchesSection'
 import { StandingWithTeam } from '@/types'
-import { Calendar, CalendarDays, Trophy } from 'lucide-react'
-import { getAllUpcomingMatches, groupMatchesByLeague, TheSportsDBMatch } from '@/lib/thesportsdb'
+import { Calendar, CalendarDays } from 'lucide-react'
+import { getAllUpcomingMatches, groupMatchesByLeague, SportDBMatch, AVAILABLE_SPORTS } from '@/lib/sportdb'
 
 export const metadata: Metadata = {
   title: 'Центр ставок — Матчи | Тренды спорта',
@@ -81,13 +81,15 @@ export default async function MatchesPage() {
     getStandings(),
   ])
 
-  // Separate football and hockey matches
-  const footballMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'football')
-  const hockeyMatches = apiMatches.filter((m: TheSportsDBMatch) => m.sport === 'hockey')
-
-  // Group by league
-  const footballByLeague = groupMatchesByLeague(footballMatches)
-  const hockeyByLeague = groupMatchesByLeague(hockeyMatches)
+  // Group matches by sport, then by league
+  const matchesBySport = AVAILABLE_SPORTS.map(sport => {
+    const sportMatches = apiMatches.filter((m: SportDBMatch) => m.sport === sport.slug)
+    return {
+      ...sport,
+      matches: sportMatches,
+      byLeague: groupMatchesByLeague(sportMatches),
+    }
+  }).filter(sport => sport.matches.length > 0)
 
   // Get today's date for header
   const today = new Date()
@@ -148,15 +150,15 @@ export default async function MatchesPage() {
             {/* Date Header */}
             <h2 className="text-2xl font-bold mb-6 capitalize">Сегодня, {todayStr}</h2>
 
-            {/* Football Matches */}
-            {Object.keys(footballByLeague).length > 0 && (
-              <div className="mb-8">
+            {/* All Sports Matches */}
+            {matchesBySport.map(sport => (
+              <div key={sport.slug} className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-6 h-6 text-amber-500" />
-                  <h3 className="text-xl font-bold">Футбол</h3>
-                  <span className="text-slate-500">({footballMatches.length})</span>
+                  <span className="text-2xl">{sport.icon}</span>
+                  <h3 className="text-xl font-bold">{sport.name}</h3>
+                  <span className="text-slate-500">({sport.matches.length})</span>
                 </div>
-                {Object.entries(footballByLeague).map(([league, matches]) => (
+                {Object.entries(sport.byLeague).map(([league, matches]) => (
                   <MatchesSection
                     key={league}
                     title={league}
@@ -164,30 +166,12 @@ export default async function MatchesPage() {
                   />
                 ))}
               </div>
-            )}
-
-            {/* Hockey Matches */}
-            {Object.keys(hockeyByLeague).length > 0 && (
-              <div className="mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-6 h-6 text-amber-500" />
-                  <h3 className="text-xl font-bold">Хоккей</h3>
-                  <span className="text-slate-500">({hockeyMatches.length})</span>
-                </div>
-                {Object.entries(hockeyByLeague).map(([league, matches]) => (
-                  <MatchesSection
-                    key={league}
-                    title={league}
-                    matches={matches}
-                  />
-                ))}
-              </div>
-            )}
+            ))}
 
             {/* Empty state */}
             {apiMatches.length === 0 && (
               <div className="bg-white rounded-xl p-8 text-center">
-                <Trophy className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">
                   Матчей пока нет
                 </h3>

@@ -17,7 +17,6 @@ import {
   X,
   ChevronDown,
   User,
-  Trophy,
   Users,
   Building2,
 } from 'lucide-react'
@@ -25,7 +24,6 @@ import {
 const menuItems = [
   { href: '/admin', label: 'Панель', icon: LayoutDashboard },
   { href: '/admin/articles', label: 'Статьи', icon: FileText },
-  { href: '/admin/football', label: 'Футбол API', icon: Trophy },
   { href: '/admin/categories', label: 'Категории', icon: FolderOpen },
   { href: '/admin/tags', label: 'Теги', icon: Tags },
   { href: '/admin/bookmakers', label: 'Букмекеры', icon: Building2 },

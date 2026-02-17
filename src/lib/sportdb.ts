@@ -1,10 +1,15 @@
 /**
- * SportDB.dev API Integration
- * Fetches live matches, fixtures, scores, and statistics
+ * API-Sport.ru Integration
+ * Fetches matches, fixtures, scores for football, hockey, tennis
+ * API Docs: https://app.api-sport.ru/docs
  */
 
-const SPORTDB_API_URL = 'https://api.sportdb.dev/api/flashscore'
-const SPORTDB_API_KEY = process.env.SPORTDB_API_KEY || ''
+const API_SPORT_URL = 'https://api.api-sport.ru/v2'
+const API_SPORT_KEY = process.env.API_SPORT_KEY || ''
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface SportDBMatch {
   id: string
@@ -23,124 +28,210 @@ export interface SportDBMatch {
   league: {
     name: string
     country?: string
+    id?: number
   }
   sport: string
+  minute?: number
 }
 
-export interface SportDBTeamStats {
-  team: string
-  played: number
-  won: number
-  drawn: number
-  lost: number
-  goalsFor: number
-  goalsAgainst: number
-  points: number
-}
-
-// Raw API response structure
-interface FlashscoreMatch {
-  eventId: string
-  homeName: string
-  awayName: string
-  homeLogo?: string
-  awayLogo?: string
-  homeScore?: string | null
-  awayScore?: string | null
-  eventStage: 'SCHEDULED' | 'LIVE' | 'FINISHED' | string
-  startDateTimeUtc: string
-  tournamentName: string
-  gameTime?: string
-}
-
-function mapStatus(eventStage: string): SportDBMatch['status'] {
-  switch (eventStage.toUpperCase()) {
-    case 'LIVE':
-      return 'live'
-    case 'FINISHED':
-      return 'finished'
-    case 'SCHEDULED':
-      return 'scheduled'
-    default:
-      return 'scheduled'
+// Raw API response structure from API-Sport.ru
+interface ApiSportMatch {
+  id: number
+  status: string
+  dateEvent: string
+  startTimestamp: number
+  currentMatchMinute?: number
+  tournament: {
+    id: number
+    name: string
+    translations?: { ru?: string }
+    image?: string
   }
-}
-
-function parseLeagueName(tournamentName: string): { name: string; country?: string } {
-  // Format: "COUNTRY: League Name"
-  const parts = tournamentName.split(': ')
-  if (parts.length >= 2) {
-    return { country: parts[0], name: parts.slice(1).join(': ') }
+  category: {
+    id: number
+    name: string
+    translations?: { ru?: string }
+    image?: string
   }
-  return { name: tournamentName }
+  homeTeam: {
+    id: number
+    name: string
+    translations?: { ru?: string }
+    image?: string
+  }
+  awayTeam: {
+    id: number
+    name: string
+    translations?: { ru?: string }
+    image?: string
+  }
+  homeScore?: { current?: number }
+  awayScore?: { current?: number }
 }
 
-function mapMatch(raw: FlashscoreMatch, sport: string): SportDBMatch {
-  const league = parseLeagueName(raw.tournamentName)
+interface ApiSportResponse {
+  totalMatches: number
+  matches: ApiSportMatch[]
+}
+
+// ============================================================================
+// League/Tournament Configuration
+// ============================================================================
+
+/**
+ * Tournament IDs for filtering (discovered from API)
+ */
+export const TOURNAMENT_IDS = {
+  // Football
+  CHAMPIONS_LEAGUE: 7,
+  EUROPA_LEAGUE: 679,
+  PREMIER_LEAGUE: 17,
+  LA_LIGA: 8,
+  SERIE_A: 23,
+  BUNDESLIGA: 35,
+  LIGUE_1: 34,
+  // Hockey
+  KHL: 268,
+  VHL: 1141,
+  MHL: 1159,
+  // Tennis Grand Slams (ATP)
+  AUSTRALIAN_OPEN_ATP: 2363,
+  AUSTRALIAN_OPEN_WTA: 2571,
+} as const
+
+/**
+ * League slug to tournament IDs mapping
+ */
+export const LEAGUE_MAPPING: Record<string, { sport: SportSlug; tournamentIds: number[] }> = {
+  // Football
+  'liga-chempionov': { sport: 'football', tournamentIds: [7] },
+  'liga-evropyi': { sport: 'football', tournamentIds: [679] },
+  'apl': { sport: 'football', tournamentIds: [17] },
+  'la-liga': { sport: 'football', tournamentIds: [8] },
+  'seriya-a': { sport: 'football', tournamentIds: [23] },
+  'bundesliga': { sport: 'football', tournamentIds: [35] },
+  'liga-1': { sport: 'football', tournamentIds: [34] },
+  // Hockey
+  'khl': { sport: 'ice-hockey', tournamentIds: [268] },
+  'nhl': { sport: 'ice-hockey', tournamentIds: [268] }, // Temporary mapping
+  // Tennis (will match by name since tournament IDs change per event)
+  'australian-open': { sport: 'tennis', tournamentIds: [2363, 2571, 2455, 2650] },
+}
+
+/**
+ * Available sports in the API
+ */
+export const AVAILABLE_SPORTS = [
+  { slug: 'football', apiSlug: 'football', name: 'Футбол', icon: '⚽' },
+  { slug: 'ice-hockey', apiSlug: 'ice-hockey', name: 'Хоккей', icon: '🏒' },
+  { slug: 'tennis', apiSlug: 'tennis', name: 'Теннис', icon: '🎾' },
+] as const
+
+export type SportSlug = typeof AVAILABLE_SPORTS[number]['slug']
+
+// ============================================================================
+// API Functions
+// ============================================================================
+
+function mapStatus(apiStatus: string): SportDBMatch['status'] {
+  const status = apiStatus.toLowerCase()
+  if (status === 'inprogress' || status === 'live' || status === 'in_progress') {
+    return 'live'
+  }
+  if (status === 'finished' || status === 'ended') {
+    return 'finished'
+  }
+  if (status === 'postponed' || status === 'canceled' || status === 'cancelled') {
+    return 'postponed'
+  }
+  return 'scheduled'
+}
+
+function mapMatch(raw: ApiSportMatch, sport: string): SportDBMatch {
+  const tournamentNameRu = raw.tournament.translations?.ru || raw.tournament.name
+  const categoryNameRu = raw.category.translations?.ru || raw.category.name
+  const homeNameRu = raw.homeTeam.translations?.ru || raw.homeTeam.name
+  const awayNameRu = raw.awayTeam.translations?.ru || raw.awayTeam.name
+
   return {
-    id: raw.eventId,
+    id: String(raw.id),
     homeTeam: {
-      name: raw.homeName,
-      logo: raw.homeLogo,
+      name: homeNameRu,
+      logo: raw.homeTeam.image,
     },
     awayTeam: {
-      name: raw.awayName,
-      logo: raw.awayLogo,
+      name: awayNameRu,
+      logo: raw.awayTeam.image,
     },
-    homeScore: raw.homeScore != null ? parseInt(raw.homeScore, 10) : null,
-    awayScore: raw.awayScore != null ? parseInt(raw.awayScore, 10) : null,
-    status: mapStatus(raw.eventStage),
-    startTime: raw.startDateTimeUtc,
-    league,
-    sport,
+    homeScore: raw.homeScore?.current ?? null,
+    awayScore: raw.awayScore?.current ?? null,
+    status: mapStatus(raw.status),
+    startTime: new Date(raw.startTimestamp).toISOString(),
+    league: {
+      name: tournamentNameRu,
+      country: categoryNameRu,
+      id: raw.tournament.id,
+    },
+    sport: sport === 'ice-hockey' ? 'hockey' : sport,
+    minute: raw.currentMatchMinute,
   }
 }
 
-async function fetchFromSportDB<T>(endpoint: string): Promise<T | null> {
+async function fetchFromApiSport<T>(endpoint: string): Promise<T | null> {
   try {
-    const response = await fetch(`${SPORTDB_API_URL}${endpoint}`, {
+    const response = await fetch(`${API_SPORT_URL}${endpoint}`, {
       headers: {
-        'X-API-Key': SPORTDB_API_KEY,
+        Authorization: API_SPORT_KEY,
       },
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      next: { revalidate: 60 },
     })
 
     if (!response.ok) {
-      console.error('SportDB API error:', response.status, response.statusText)
+      console.error('API-Sport error:', response.status, response.statusText)
       return null
     }
 
     return await response.json()
   } catch (error) {
-    console.error('SportDB API fetch error:', error)
+    console.error('API-Sport fetch error:', error)
     return null
   }
 }
 
 /**
- * Get matches by date (football + hockey combined)
+ * Get matches by date for a specific sport
+ */
+async function getMatchesByDateAndSport(
+  date: Date,
+  sport: typeof AVAILABLE_SPORTS[number]
+): Promise<SportDBMatch[]> {
+  try {
+    const dateStr = date.toISOString().split('T')[0]
+    const data = await fetchFromApiSport<ApiSportResponse>(
+      `/${sport.apiSlug}/matches?date=${dateStr}`
+    )
+
+    if (!data?.matches || !Array.isArray(data.matches)) {
+      return []
+    }
+
+    return data.matches.map(m => mapMatch(m, sport.slug))
+  } catch (error) {
+    console.error(`Error fetching ${sport.name} matches:`, error)
+    return []
+  }
+}
+
+/**
+ * Get matches by date (all sports combined)
  */
 export async function getMatchesByDate(date: Date): Promise<SportDBMatch[]> {
   try {
-    const dateStr = date.toISOString().split('T')[0] // Format: YYYY-MM-DD
+    const results = await Promise.all(
+      AVAILABLE_SPORTS.map(sport => getMatchesByDateAndSport(date, sport))
+    )
 
-    // Fetch football and hockey matches for specific date
-    const [footballData, hockeyData] = await Promise.all([
-      fetchFromSportDB<FlashscoreMatch[]>(`/football/fixtures?date=${dateStr}`),
-      fetchFromSportDB<FlashscoreMatch[]>(`/hockey/fixtures?date=${dateStr}`),
-    ])
-
-    const matches: SportDBMatch[] = []
-
-    if (footballData && Array.isArray(footballData)) {
-      matches.push(...footballData.map(m => mapMatch(m, 'football')))
-    }
-
-    if (hockeyData && Array.isArray(hockeyData)) {
-      matches.push(...hockeyData.map(m => mapMatch(m, 'hockey')))
-    }
-
-    // Sort by start time
+    const matches = results.flat()
     matches.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
 
     return matches
@@ -151,7 +242,14 @@ export async function getMatchesByDate(date: Date): Promise<SportDBMatch[]> {
 }
 
 /**
- * Get tomorrow's matches (football + hockey combined)
+ * Get today's matches (all sports combined)
+ */
+export async function getTodayMatches(): Promise<SportDBMatch[]> {
+  return getMatchesByDate(new Date())
+}
+
+/**
+ * Get tomorrow's matches (all sports combined)
  */
 export async function getTomorrowMatches(): Promise<SportDBMatch[]> {
   const tomorrow = new Date()
@@ -160,34 +258,42 @@ export async function getTomorrowMatches(): Promise<SportDBMatch[]> {
 }
 
 /**
- * Get today's matches (football + hockey combined)
+ * Get all upcoming matches (alias for today)
  */
-export async function getTodayMatches(): Promise<SportDBMatch[]> {
-  try {
-    // Fetch football and hockey matches in parallel
-    const [footballData, hockeyData] = await Promise.all([
-      fetchFromSportDB<FlashscoreMatch[]>('/football/live'),
-      fetchFromSportDB<FlashscoreMatch[]>('/hockey/live'),
-    ])
+export async function getAllUpcomingMatches(): Promise<SportDBMatch[]> {
+  return getTodayMatches()
+}
 
-    const matches: SportDBMatch[] = []
+/**
+ * Get matches for a specific sport
+ */
+export async function getMatchesBySport(sport: SportSlug): Promise<SportDBMatch[]> {
+  const sportConfig = AVAILABLE_SPORTS.find(s => s.slug === sport)
+  if (!sportConfig) return []
 
-    if (footballData && Array.isArray(footballData)) {
-      matches.push(...footballData.map(m => mapMatch(m, 'football')))
-    }
+  return getMatchesByDateAndSport(new Date(), sportConfig)
+}
 
-    if (hockeyData && Array.isArray(hockeyData)) {
-      matches.push(...hockeyData.map(m => mapMatch(m, 'hockey')))
-    }
-
-    // Sort by start time
-    matches.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-
-    return matches
-  } catch (error) {
-    console.error('Error fetching today matches:', error)
+/**
+ * Get matches by league slug (from URL)
+ */
+export async function getMatchesByLeague(
+  leagueSlug: string,
+  date?: Date
+): Promise<SportDBMatch[]> {
+  const mapping = LEAGUE_MAPPING[leagueSlug]
+  if (!mapping) {
+    console.warn(`Unknown league slug: ${leagueSlug}`)
     return []
   }
+
+  const sportConfig = AVAILABLE_SPORTS.find(s => s.slug === mapping.sport)
+  if (!sportConfig) return []
+
+  const matches = await getMatchesByDateAndSport(date || new Date(), sportConfig)
+
+  // Filter by tournament IDs
+  return matches.filter(m => mapping.tournamentIds.includes(m.league.id || 0))
 }
 
 /**
@@ -202,44 +308,36 @@ export async function getLiveMatches(): Promise<SportDBMatch[]> {
  * Get football matches
  */
 export async function getFootballMatches(): Promise<SportDBMatch[]> {
-  const data = await fetchFromSportDB<FlashscoreMatch[]>('/football/live')
-  if (!data || !Array.isArray(data)) {
-    return []
-  }
-  return data.map(m => mapMatch(m, 'football'))
+  return getMatchesBySport('football')
 }
 
 /**
  * Get hockey matches
  */
 export async function getHockeyMatches(): Promise<SportDBMatch[]> {
-  const data = await fetchFromSportDB<FlashscoreMatch[]>('/hockey/live')
-  if (!data || !Array.isArray(data)) {
-    return []
-  }
-  return data.map(m => mapMatch(m, 'hockey'))
+  return getMatchesBySport('ice-hockey')
+}
+
+/**
+ * Get tennis matches
+ */
+export async function getTennisMatches(): Promise<SportDBMatch[]> {
+  return getMatchesBySport('tennis')
 }
 
 /**
  * Get match details
  */
-export async function getMatchDetails(matchId: string) {
-  return fetchFromSportDB(`/match/${matchId}/details`)
+export async function getMatchDetails(matchId: string, sport: SportSlug = 'football') {
+  const sportConfig = AVAILABLE_SPORTS.find(s => s.slug === sport)
+  if (!sportConfig) return null
+
+  return fetchFromApiSport(`/${sportConfig.apiSlug}/matches/${matchId}`)
 }
 
-/**
- * Get match lineups
- */
-export async function getMatchLineups(matchId: string) {
-  return fetchFromSportDB(`/match/${matchId}/lineups`)
-}
-
-/**
- * Get match statistics
- */
-export async function getMatchStats(matchId: string) {
-  return fetchFromSportDB(`/match/${matchId}/stats`)
-}
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 /**
  * Format match time for display
@@ -281,4 +379,31 @@ export function getStatusColor(status: SportDBMatch['status']): string {
     postponed: 'bg-yellow-100 text-yellow-700',
   }
   return colors[status]
+}
+
+/**
+ * Group matches by league
+ */
+export function groupMatchesByLeague(matches: SportDBMatch[]): Record<string, SportDBMatch[]> {
+  const grouped: Record<string, SportDBMatch[]> = {}
+
+  matches.forEach(match => {
+    const leagueName = match.league.country
+      ? `${match.league.country}: ${match.league.name}`
+      : match.league.name
+
+    if (!grouped[leagueName]) {
+      grouped[leagueName] = []
+    }
+    grouped[leagueName].push(match)
+  })
+
+  return grouped
+}
+
+/**
+ * Get sport info by slug
+ */
+export function getSportInfo(slug: string) {
+  return AVAILABLE_SPORTS.find(s => s.slug === slug || s.slug === slug.replace('hockey', 'ice-hockey'))
 }
