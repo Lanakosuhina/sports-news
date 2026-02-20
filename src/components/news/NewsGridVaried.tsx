@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArticleWithRelations } from '@/types'
-import { timeAgo, getImageUrl } from '@/lib/utils'
+import { getImageUrl } from '@/lib/utils'
+import TimeAgo from '@/components/ui/TimeAgo'
 
 interface NewsGridVariedProps {
   articles: ArticleWithRelations[]
@@ -32,7 +33,7 @@ function LargeCard({ article }: { article: ArticleWithRelations }) {
           {article.excerpt}
         </p>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </div>
     </Link>
@@ -53,7 +54,7 @@ function SmallCard({ article }: { article: ArticleWithRelations }) {
           {article.title}
         </h4>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </div>
     </Link>
@@ -82,7 +83,7 @@ function MediumCard({ article }: { article: ArticleWithRelations }) {
           {article.title}
         </h3>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </div>
     </Link>

@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import NewsGridVaried from '@/components/news/NewsGridVaried'
+
+// Force dynamic rendering to get fresh data on each request
+export const dynamic = 'force-dynamic'
 import Sidebar from '@/components/layout/Sidebar'
 import BookmakersTable from '@/components/bookmakers/BookmakersTable'
 import SelectionsSidebar from '@/components/bookmakers/SelectionsSidebar'

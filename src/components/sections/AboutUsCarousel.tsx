@@ -48,23 +48,12 @@ const aboutItems = [
 
 export default function AboutUsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [itemsPerView, setItemsPerView] = useState(4)
+  const [mounted, setMounted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Mark as mounted after hydration
   useEffect(() => {
-    const updateItemsPerView = () => {
-      if (window.innerWidth < 768) {
-        setItemsPerView(1)
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(2)
-      } else {
-        setItemsPerView(4)
-      }
-    }
-
-    updateItemsPerView()
-    window.addEventListener('resize', updateItemsPerView)
-    return () => window.removeEventListener('resize', updateItemsPerView)
+    setMounted(true)
   }, [])
 
   const maxIndex = aboutItems.length - 1
@@ -77,12 +66,12 @@ export default function AboutUsCarousel() {
     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1))
   }
 
-  // Get visible items - always show itemsPerView items, scrolling by 1
+  // Always get 4 items starting from currentIndex (CSS handles responsive display)
   const getVisibleItems = () => {
     const items = []
-    for (let i = 0; i < itemsPerView; i++) {
+    for (let i = 0; i < 4; i++) {
       const index = (currentIndex + i) % aboutItems.length
-      items.push(aboutItems[index])
+      items.push({ ...aboutItems[index], originalIndex: index })
     }
     return items
   }
@@ -98,12 +87,13 @@ export default function AboutUsCarousel() {
           <div
             ref={containerRef}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            suppressHydrationWarning
           >
-            {visibleItems.map((item, index) => {
+            {visibleItems.map((item) => {
               const IconComponent = item.icon
               return (
                 <div
-                  key={`${currentIndex}-${index}`}
+                  key={item.originalIndex}
                   className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   <IconComponent className="w-8 h-8 text-blue-500 mb-4" />

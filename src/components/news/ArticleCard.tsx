@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArticleWithRelations } from '@/types'
-import { timeAgo, getImageUrl, hasImage } from '@/lib/utils'
+import { getImageUrl, hasImage } from '@/lib/utils'
+import TimeAgo from '@/components/ui/TimeAgo'
 
 interface ArticleCardProps {
   article: ArticleWithRelations
@@ -39,7 +40,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           <div className="flex items-center gap-3 text-sm text-slate-400">
             {article.author && <span>{article.author.name}</span>}
             <span>•</span>
-            <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+            <TimeAgo date={article.publishedAt || article.createdAt} />
           </div>
         </div>
       </Link>
@@ -64,7 +65,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
             {article.excerpt}
           </p>
           <div className="text-xs text-slate-500">
-            <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+            <TimeAgo date={article.publishedAt || article.createdAt} />
           </div>
         </Link>
       )
@@ -93,7 +94,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
             {article.excerpt}
           </p>
           <div className="text-xs text-slate-500">
-            <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+            <TimeAgo date={article.publishedAt || article.createdAt} />
           </div>
         </div>
       </Link>
@@ -112,7 +113,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
             {article.title}
           </h4>
           <span className="text-xs text-slate-500 mt-1 block">
-            {timeAgo(article.publishedAt || article.createdAt)}
+            <TimeAgo date={article.publishedAt || article.createdAt} />
           </span>
         </Link>
       )
@@ -135,7 +136,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
             {article.title}
           </h4>
           <span className="text-xs text-slate-500 mt-1 block">
-            {timeAgo(article.publishedAt || article.createdAt)}
+            <TimeAgo date={article.publishedAt || article.createdAt} />
           </span>
         </div>
       </Link>
@@ -159,7 +160,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           {article.excerpt}
         </p>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </Link>
     )
@@ -182,7 +183,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           {article.excerpt}
         </p>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </Link>
     )
@@ -212,7 +213,7 @@ export default function ArticleCard({ article, variant = 'default' }: ArticleCar
           {article.excerpt}
         </p>
         <div className="text-xs text-slate-500">
-          <span>{timeAgo(article.publishedAt || article.createdAt)}</span>
+          <TimeAgo date={article.publishedAt || article.createdAt} />
         </div>
       </div>
     </Link>

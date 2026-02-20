@@ -1,5 +1,8 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
+// Force dynamic rendering to get fresh data
+export const dynamic = 'force-dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
@@ -8,7 +11,7 @@ import AdZone from '@/components/ui/AdZone'
 import { formatDate, getImageUrl } from '@/lib/utils'
 import { ArticleWithRelations } from '@/types'
 import { Calendar, User, Tag } from 'lucide-react'
-import { timeAgo } from '@/lib/utils'
+import TimeAgo from '@/components/ui/TimeAgo'
 import {
   generateArticleSchema,
   generateBreadcrumbSchema,
@@ -404,7 +407,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         {relatedArticle.title}
                       </h3>
                       <div className="text-xs text-slate-500">
-                        <span>{timeAgo(relatedArticle.publishedAt || relatedArticle.createdAt)}</span>
+                        <TimeAgo date={relatedArticle.publishedAt || relatedArticle.createdAt} />
                       </div>
                     </div>
                   </Link>
@@ -424,7 +427,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                         {relatedArticle.title}
                       </h4>
                       <div className="text-xs text-slate-500">
-                        <span>{timeAgo(relatedArticle.publishedAt || relatedArticle.createdAt)}</span>
+                        <TimeAgo date={relatedArticle.publishedAt || relatedArticle.createdAt} />
                       </div>
                     </div>
                   </Link>
